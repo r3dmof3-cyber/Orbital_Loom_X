@@ -305,28 +305,38 @@
 
   /* ═════════ parade of sizes ═════════ */
   const SZ = [[0, 0.383], [3, 0.532], [1, 0.949], [2, 1], [7, 3.88], [6, 4.01], [5, 9.45], [4, 11.21], [8, 109]];
-  const SZX = (() => { const xs = [0]; for (let i = 1; i < SZ.length; i++) xs.push(xs[i - 1] + (SZ[i - 1][1] + SZ[i][1]) * 1.22); return xs; })();
+  /* every body keeps its real axial tilt, so Saturn's rings are inclined and Uranus's stand almost upright.
+     ext = half-width the body really occupies along the line-up, rings included, so nothing overlaps its neighbour */
+  const SZB = SZ.map(([type, R]) => {
+    const pl = E.PLANETS[type], o = (pl ? pl.obl : 7) * Math.PI / 180;
+    const axis = v3.norm([Math.sin(o) * 0.45, Math.cos(o), Math.sin(o) * 0.89]);
+    const a1 = v3.norm(v3.cross(axis, Math.abs(axis[2]) > 0.95 ? X : Z)), a2 = v3.cross(axis, a1);
+    const ring = pl && pl.ring ? pl.ring : 1;
+    return { axis, a1, a2, ext: Math.max(R, R * ring * Math.sqrt(1 - axis[0] * axis[0])) };
+  });
+  const SZX = (() => { const xs = [0]; for (let i = 1; i < SZ.length; i++) xs.push(xs[i - 1] + (SZB[i - 1].ext + SZB[i].ext) * 1.2 + (SZ[i - 1][1] + SZ[i][1]) * 0.2); return xs; })();
   function sizes(c) {
     const f = clamp((st.t % 40) / 3.6, 0, SZ.length - 1), i0 = Math.floor(f), i1 = Math.min(i0 + 1, SZ.length - 1);
     let u = f - i0; u = clamp((u - 0.45) / 0.55, 0, 1); u = u * u * (3 - 2 * u);
     const fx = lerp(SZX[i0], SZX[i1], u), fr = Math.exp(lerp(Math.log(SZ[i0][1]), Math.log(SZ[i1][1]), u));
-    cam.storyDist = fr * 4.6;
-    const sunV = mulPoint(cam.view, [-6e4, 2.2e4, 2.2e4]), axis = v3.norm([0.25, 1, 0.12]), a1 = v3.norm(v3.cross(axis, Z)), a2 = v3.cross(axis, a1);
-    const basis = basisMat({ a1, a2, axis });
+    const fe = Math.exp(lerp(Math.log(SZB[i0].ext), Math.log(SZB[i1].ext), u));
+    cam.storyDist = Math.max(fr * 4.6, fe * 2.9);
+    const sunV = mulPoint(cam.view, [-6e4, 2.2e4, 2.2e4]);
     stateBodies();
     const jobs = [];
     SZ.forEach(([type, R], i) => {
       const pos = [SZX[i] - fx + (type === 8 ? (1 - clamp((f - 6.4) / 1.3, 0, 1)) ** 2 * 900 : 0), 0, 0];
       if (Math.abs(pos[0]) - R > cam.dist * 3.2) return;
       const pl = E.PLANETS[type];
-      drawBody(pos, R, type, { uBasis: basis, uSpin: sim.realTime * 0.12, uEmis: type === 8 ? 0.85 : 1, uColor: type === 8 ? [1, 0.8, 0.4] : pl.col, uSunV: sunV, uRingN: mulDir(cam.view, axis) });
-      if (pl && pl.ring) jobs.push([pos, R, pl, type]);
+      const B = SZB[i];
+      drawBody(pos, R, type, { uBasis: basisMat(B), uSpin: sim.realTime * 0.12, uEmis: type === 8 ? 0.85 : 1, uColor: type === 8 ? [1, 0.8, 0.4] : pl.col, uSunV: sunV, uRingN: mulDir(cam.view, B.axis) });
+      if (pl && pl.ring) jobs.push([pos, R, pl, type, B]);
       const near = Math.abs(i - f) < 1.6;
       if (near) label([pos[0], R * 1.12, 0], type === 8 ? tx('الشمس', 'Sun') : tx(pl.ar, pl.en), `${R >= 10 ? R.toFixed(0) : R.toFixed(2)} × ${tx('الأرض', 'Earth')}`, type === 8 ? '#ffd38a' : `rgb(${pl.col.map((x) => Math.round(x * 255)).join(',')})`, true);
     });
     gl.depthMask(false);
-    jobs.forEach(([pos, R, pl, type]) => {
-      use(P.ring, { uVP: cam.vp, uCenter: pos, uA1: a1, uA2: a2, uR: R, uOut: pl.ring, uSun: [-6e4, 2.2e4, 2.2e4], uCam: cam.eye, uN: axis, uType: type, uStyle: S.planetStyle, uTint: pl.col });
+    jobs.forEach(([pos, R, pl, type, B]) => {
+      use(P.ring, { uVP: cam.vp, uCenter: pos, uA1: B.a1, uA2: B.a2, uR: R, uOut: pl.ring, uSun: [-6e4, 2.2e4, 2.2e4], uCam: cam.eye, uN: B.axis, uType: type, uStyle: S.planetStyle, uTint: pl.col });
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     });
     audio.tick = 0; audio.chirp = 0;
