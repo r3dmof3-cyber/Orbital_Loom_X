@@ -21,7 +21,7 @@ const S = {
   trailStyle: 0, trailColor: 0, orbitModel: 0, planetStyle: 0, planetScale: 1, waveAmplitude: 40, waveCount: 4,
   background: 0, quality: 1, renderScale: 1, fpsLimit: 1, bloom: 1, exposure: 1, cinematicFx: true,
   showLabels: true, showDropLines: true, showExtinctions: true, showGalaxyGrid: true, heliosphere: 0,
-  hudLayout: 0, hudOpacity: 0.9, showClock: true, accent: '#F5B94A', audioReactive: true, mouseParallax: true, directorStories: true, autoPerf: true, resolution: 0,
+  hudLayout: 0, hudOpacity: 0.9, showClock: true, accent: '#F5B94A', audioReactive: true, mouseParallax: true, directorStories: true, autoPerf: true, resolution: 0, photoMaps: true,
 };
 
 /* ───────────────────────── world constants ───────────────────────── */
@@ -187,6 +187,20 @@ function use(prog, vals) {
   }
 }
 
+/* programs are linked first and inspected later, so drivers with parallel compilation build them concurrently */
+function startProgram(vs, fs) {
+  const p = gl.createProgram(), a = gl.createShader(gl.VERTEX_SHADER), b = gl.createShader(gl.FRAGMENT_SHADER);
+  gl.shaderSource(a, vs); gl.compileShader(a); gl.shaderSource(b, fs); gl.compileShader(b);
+  gl.attachShader(p, a); gl.attachShader(p, b); gl.linkProgram(p);
+  return { p, b };
+}
+function finishProgram({ p, b }) {
+  if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error('Link failed: ' + gl.getProgramInfoLog(p) + ' ' + gl.getShaderInfoLog(b));
+  const u = {}, n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS);
+  for (let i = 0; i < n; i++) { const info = gl.getActiveUniform(p, i); u[info.name.replace(/\[0\]$/, '')] = { loc: gl.getUniformLocation(p, info.name), type: info.type, size: info.size }; }
+  return { p, u };
+}
+const programs = (list) => list.map(([vs, fs]) => startProgram(vs, fs)).map(finishProgram);
 const SH = window.SH;
 const P = {
   nebgen: program(SH.VS_FULL, SH.FS_NEBGEN),
@@ -194,7 +208,6 @@ const P = {
   skyStars: program(SH.VS_SKYSTARS, SH.FS_POINT),
   galaxy: program(SH.VS_GALAXY, SH.FS_GALAXY),
   bh: program(SH.VS_FULL, SH.FS_BH),
-  body: program(SH.VS_BILL, SH.FS_BODY),
   corona: program(SH.VS_BILL, SH.FS_CORONA),
   ring: program(SH.VS_RING, SH.FS_RING),
   trail: program(SH.VS_TRAIL, SH.FS_TRAIL),
@@ -208,6 +221,26 @@ const P = {
   up: program(SH.VS_FULL, SH.FS_UP),
   comp: program(SH.VS_FULL, SH.FS_COMP),
 };
+/* planet bodies: one program per type. A light build is ready at once; the detailed build (8-octave noise, craters,
+   relief) takes the driver several seconds the first time, so it is compiled in the background and swapped in when done. */
+const BODY_TYPES = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+const bodySrc = (t, lite) => SH.FS_BODY.replace('#define PI', '#define BT ' + t + (lite ? '\n#define LITE 1' : '') + '\n#define PI');
+P.bodyT = programs(BODY_TYPES.map((t) => [SH.VS_BILL, bodySrc(t, true)]));
+P.body = P.bodyT[2];
+const KHR_PAR = gl.getExtension('KHR_parallel_shader_compile');
+let fullJobs = null;
+function upgradeBodies() {
+  if (fullJobs === 'done' || S.quality === 0 || (!KHR_PAR && S.quality < 2)) return;
+  if (!fullJobs) { fullJobs = BODY_TYPES.map((t) => startProgram(SH.VS_BILL, bodySrc(t, false))); return; }
+  let left = 0;
+  fullJobs.forEach((j, t) => {
+    if (!j) return;
+    if (KHR_PAR && !gl.getProgramParameter(j.p, KHR_PAR.COMPLETION_STATUS_KHR)) { left++; return; }
+    try { P.bodyT[t] = finishProgram(j); } catch (e) { console.warn(e); }
+    fullJobs[t] = null;
+  });
+  if (!left) fullJobs = 'done';
+}
 const emptyVAO = gl.createVertexArray();
 
 /* deterministic RNG */
@@ -655,6 +688,37 @@ function bodyBasis(i, F) {
   return { a1, a2, axis };
 }
 
+/* ── optional photographic planet maps (textures/*.jpg, or embedded data URIs in the desktop build) ── */
+const MAP_NAMES = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'sun'];
+const maps = {}; let mapsAsked = false;
+function loadMap(name) {
+  const m = maps[name] = { tex: null, ready: false };
+  const img = new Image();
+  img.onload = () => {
+    try {
+      const t = gl.createTexture();
+      gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, t);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.SRGB8_ALPHA8, gl.RGBA, gl.UNSIGNED_BYTE, img);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+      gl.generateMipmap(gl.TEXTURE_2D);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      const an = gl.getExtension('EXT_texture_filter_anisotropic');
+      if (an) gl.texParameterf(gl.TEXTURE_2D, an.TEXTURE_MAX_ANISOTROPY_EXT, Math.min(8, gl.getParameter(an.MAX_TEXTURE_MAX_ANISOTROPY_EXT)));
+      m.tex = t; m.ready = true;
+    } catch (e) { /* blocked (e.g. file:// origin): the procedural surface stays */ }
+  };
+  const emb = window.OLX_MAPS && window.OLX_MAPS[name];
+  img.src = emb || ('textures/' + name + '.jpg');
+}
+function wantMaps() {
+  if (mapsAsked || !S.photoMaps) return;
+  mapsAsked = true;
+  MAP_NAMES.concat(['earth_night']).forEach(loadMap);
+}
 function drawBody(center, R, type, extra) {
   const d = v3.len(v3.sub(center, cam.eye));
   if (d <= R * 1.02) return 0;
@@ -667,11 +731,21 @@ function drawBody(center, R, type, extra) {
     if (zc > 1e-4) { const th = Math.atan2(off, zc), al = Math.asin(Math.min(R / d, 0.999)); q = Math.max(q, zc * (Math.tan(Math.min(th + al, 1.5)) - Math.tan(th)) * 1.08 + 2.5 * d / cam.focal); }
     else q = Math.max(q, R * 40);
   }
-  use(P.body, Object.assign({
+  const bodyP = P.bodyT[type] || P.body;
+  use(bodyP, Object.assign({
     uView: cam.view, uProj: cam.proj, uCenter: center, uQuad: q, uCenterV: cv, uR: R, uFocal: cam.focal,
     uTime: sim.realTime, uType: type, uStyle: S.planetStyle, uAudio: sim.audio,
-    uLod: clamp((pxR - 22) / 200, 0, 1) * [0.5, 1, 1, 1][S.quality],
+    uLod: clamp((pxR - 22) / 200, 0, 1) * [0.5, 1, 1, 1][S.quality], uMap: 0, uMap2: 1, uUseMap: 0,
   }, extra));
+  if (S.photoMaps && S.planetStyle === 0 && pxR > 3) {
+    wantMaps();
+    const m = maps[MAP_NAMES[type]], n = maps.earth_night;
+    if (m && m.ready && (type !== 2 || (n && n.ready))) {
+      gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, m.tex);
+      if (type === 2) { gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, n.tex); gl.activeTexture(gl.TEXTURE0); }
+      if (bodyP.u.uUseMap) gl.uniform1f(bodyP.u.uUseMap.loc, 1);
+    }
+  }
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   return pxR;
 }
@@ -680,6 +754,7 @@ function mulDir(m, p) { return [m[0] * p[0] + m[4] * p[1] + m[8] * p[2], m[1] * 
 
 const screenPlanets = [];
 function render() {
+  upgradeBodies();
   const F = frameAt(sim.theta);
   computeCamera(F);
   const accent = hexToRgb(S.accent);
@@ -1211,6 +1286,7 @@ window.livelyPropertyListener = function (name, val) {
     case 'renderScale': S.renderScale = clamp(n / 100, 0.3, 2); resize(); break;
     case 'directorStories': S.directorStories = bool(val); DIRECTOR_ORDER = S.directorStories ? DIRECTOR_ALL : DIRECTOR_SOLAR; directorIdx = 0; if (S.viewMode === 0) setShot(DIRECTOR_ORDER[0]); break;
     case 'autoPerf': S.autoPerf = bool(val); if (!S.autoPerf) { drs = 1; resize(); } break;
+    case 'photoMaps': S.photoMaps = bool(val); break;
     case 'resolution': S.resolution = clamp(n | 0, 0, 4); drs = S.resolution ? 1 : GPU_TIER === 0 ? 0.7 : 1; resize(); break;
     case 'fpsLimit': S.fpsLimit = clamp(n | 0, 0, 2); break;
     case 'bloom': S.bloom = clamp(n / 100, 0, 3); break;

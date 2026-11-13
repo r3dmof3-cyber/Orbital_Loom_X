@@ -1,0 +1,5 @@
+Planet and Sun maps (2K equirectangular) are from Solar System Scope
+https://www.solarsystemscope.com/textures/
+License: Creative Commons Attribution 4.0 International (CC BY 4.0).
+They are based on NASA imagery and elevation data. Re-encoded as JPEG, otherwise unchanged.
+The rest of Orbital Loom X is MIT licensed; these image files keep their CC BY 4.0 license.

@@ -190,7 +190,13 @@ void main(){
 const FS_BODY = H + NOISE + `
 in vec3 vPos; out vec4 o;
 uniform mat4 uView, uProj; uniform vec3 uCenterV; uniform float uR, uFocal, uSpin, uTime, uEmis, uAudio;
-uniform mat3 uBasis; uniform int uType, uStyle; uniform vec3 uColor, uSunV, uRingN; uniform vec2 uRingR;
+uniform mat3 uBasis; uniform int uStyle; uniform vec3 uColor, uSunV, uRingN; uniform vec2 uRingR;
+// one program per body type (BT set by the engine): a single shader with every surface compiled far too slowly on Direct3D
+#ifdef BT
+#define uType BT
+#else
+uniform int uType;
+#endif
 
 float ringDensity(float r){
   if (uType == 5) {
@@ -208,24 +214,34 @@ float ringDensity(float r){
   return d * 0.35;
 }
 
-uniform float uLod;
+uniform float uLod, uUseMap; uniform sampler2D uMap, uMap2;
+// equirectangular lookup; uv and its seam-free derivatives are computed once in main(), outside any branch
+vec2 gUV, gDx, gDy;
+vec3 mapAt(sampler2D t, vec3 p){ return textureGrad(t, gUV, gDx, gDy).rgb; }
+// LITE builds compile in a fraction of a second and are shown first; the full build replaces them when the driver has finished it
+#ifdef LITE
+float fbmH(vec3 p){ return fbm3(p); }
+#else
 float fbmH(vec3 p){ float a = 0.5, s = 0.0; for (int i = 0; i < 8; i++){ s += a*vnoise(p); p = p*2.03 + vec3(1.7, 9.2, 3.1); a *= 0.5; } return s; }
+#endif
 vec3 hash33(vec3 p){ p = fract(p * vec3(0.1031, 0.1030, 0.0973)); p += dot(p, p.yxz + 33.33); return fract((p.xxy + p.yxx) * p.zyx); }
 // crater field: bowl (negative) with a raised rim (positive)
+#ifdef LITE
+float craters(vec3 p, float sc){ return 0.0; }
+#else
 float craters(vec3 p, float sc){
-  p *= sc; vec3 i = floor(p), f = fract(p); float h = 0.0;
-  for (int x = -1; x <= 1; x++) for (int y = -1; y <= 1; y++) for (int z = -1; z <= 1; z++){
+  p = p * sc - 0.5; vec3 i = floor(p), f = fract(p); float h = 0.0;   // 8 nearest cells are enough: crater radius < half a cell
+  for (int x = 0; x <= 1; x++) for (int y = 0; y <= 1; y++) for (int z = 0; z <= 1; z++){
     vec3 g = vec3(float(x), float(y), float(z)); vec3 o3 = hash33(i + g);
-    if (o3.y < 0.42) continue;
-    float rad = 0.16 + 0.30 * o3.x * o3.z;
+    float rad = (0.16 + 0.30 * o3.x * o3.z) * step(0.42, o3.y) + 1e-4;
     float d = length(g + o3 - f) / rad;
     h += (smoothstep(0.72, 1.0, d) * (1.0 - smoothstep(1.0, 1.4, d)) * 0.55 - (1.0 - smoothstep(0.0, 0.92, d)) * 0.8) * rad;
   }
   return h;
 }
+#endif
 float heightOf(vec3 p){
-  if (uType == 0) return (fbm(p * 5.0) - 0.5) * 0.45 + craters(p, 5.0) * 1.3 + craters(p, 13.0) * 0.9 + (fbmH(p * 26.0) - 0.5) * 0.10;
-  return (fbm(p * 3.0 + 1.0) - 0.5) * 0.9 + craters(p, 9.0) * 0.55 + (fbmH(p * 22.0) - 0.5) * 0.16;
+  return uType == 0 ? craters(p, 5.0) * 1.3 + craters(p, 13.0) * 0.9 : craters(p, 9.0) * 0.6;
 }
 
 vec3 surface(vec3 p, float lat, out float spec, out vec3 night, out vec3 atm, out float atmK){
@@ -343,6 +359,12 @@ void main(){
   float cs = cos(uSpin), sn = sin(uSpin);
   vec3 p = vec3(cs*l.x - sn*l.y, sn*l.x + cs*l.y, l.z);
   float lat = l.z;
+  {
+    float mu1 = atan(p.y, p.x) / TAU + 0.5, mv = asin(clamp(p.z, -1.0, 1.0)) / PI + 0.5, mu2 = fract(mu1 + 0.5) - 0.5;
+    float ax = dFdx(mu1), ay = dFdy(mu1), bx = dFdx(mu2), by = dFdy(mu2);
+    bool alt = abs(bx) + abs(by) < abs(ax) + abs(ay);
+    gUV = vec2(mu1, mv); gDx = vec2(alt ? bx : ax, dFdx(mv)); gDy = vec2(alt ? by : ay, dFdy(mv));
+  }
 
   if (uType == 8) {
     float g = fbm(p * 16.0 + vec3(0.0, uTime * 0.04, uTime*0.02));
@@ -354,6 +376,10 @@ void main(){
     float spot = smoothstep(0.70, 0.78, fbm(p * 3.6 + 2.0)) * (1.0 - smoothstep(0.35, 0.75, abs(lat)));
     col *= 1.0 - 0.72 * spot;
     col *= uEmis * (1.0 + uAudio * 0.6);
+    if (uUseMap > 0.5) {
+      vec3 t = mapAt(uMap, p);
+      col = t * (0.55 + 0.6 * limb) * 2.1 * uEmis * (1.0 + (fbmH(p * 52.0 + vec3(0.0, uTime * 0.05, 0.0)) - 0.5) * 0.3 * uLod);
+    }
     col *= uColor / vec3(1.0, 0.8, 0.4);
     if (uStyle == 2) {
       vec2 sp = vec2(atan(p.y, p.x), asin(clamp(lat,-1.0,1.0)));
@@ -367,7 +393,8 @@ void main(){
 
   vec3 L = normalize(uSunV - hit);
   vec3 Nb = N;
-  if (uStyle == 0 && uLod > 0.02 && (uType == 0 || uType == 3)) {
+#ifndef LITE
+  if (uStyle == 0 && uLod > 0.02 && uUseMap < 0.5 && (uType == 0 || uType == 3)) {
     float e = 0.004, h0 = heightOf(p);
     vec3 g = vec3(heightOf(p + vec3(e, 0.0, 0.0)) - h0, heightOf(p + vec3(0.0, e, 0.0)) - h0, heightOf(p + vec3(0.0, 0.0, e)) - h0) / e;
     g -= p * dot(g, p);
@@ -375,6 +402,7 @@ void main(){
     vec3 lb = vec3(cs * pb.x + sn * pb.y, -sn * pb.x + cs * pb.y, pb.z);
     Nb = normalize(mat3(uView) * (uBasis * lb));
   }
+#endif
   float ndl = dot(N, L);
   float diff = clamp(dot(Nb, L) * 1.05 + 0.04, 0.0, 1.0) * smoothstep(-0.12, 0.10, ndl);
   float rim = pow(1.0 - mu, 3.0);
@@ -391,6 +419,20 @@ void main(){
   if (uStyle == 0) {
     float spec; vec3 night, atm; float atmK;
     vec3 alb = surface(p, lat, spec, night, atm, atmK);
+    if (uUseMap > 0.5) {
+      vec3 t = mapAt(uMap, p);
+      t *= 1.0 + (fbmH(p * 60.0) - 0.5) * 0.22 * uLod;                    // keeps close-ups crisp beyond the map's resolution
+      if (uType == 2) {
+        float water = smoothstep(0.02, 0.10, t.b - max(t.r, t.g) * 0.92);
+        vec3 cp = p + 0.06 * vec3(fbm(p * 5.0 + 2.0), fbm(p * 5.0 + 6.0), 0.0);
+        float cl = smoothstep(0.52, 0.78, fbm(cp * 3.2 + vec3(uTime * 0.012, 0.0, uTime * 0.006)) + 0.10 * (fbmH(p * 38.0) - 0.5));
+        cl = clamp(cl * (0.75 + 0.5 * fbm(cp * 14.0 + uTime * 0.01)), 0.0, 1.0);
+        alb = mix(t * 1.15, vec3(1.0), cl * 0.9);
+        spec = water * (1.0 - cl);
+        vec3 nt = mapAt(uMap2, p);
+        night = nt * nt * vec3(1.0, 0.78, 0.50) * 3.2 * (1.0 - cl * 0.8);
+      } else alb = t * (uType == 1 ? 0.95 : 1.12);
+    }
     col = alb * diff * shadow * 1.28 + alb * 0.05;
     col += alb * pow(1.0 - mu, 2.0) * 0.18 * clamp(ndl + 0.5, 0.0, 1.0);
     vec3 H2 = normalize(L + V);

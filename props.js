@@ -107,6 +107,11 @@ window.LIVELY_PROPS = {
    "هولوغرام شبكي / Holographic"
   ]
  },
+ "photoMaps": {
+  "type": "checkbox",
+  "value": true,
+  "text": "خرائط حقيقية للكواكب (مع النمط الواقعي) / Photographic planet maps (Realistic style)"
+ },
  "planetScale": {
   "type": "slider",
   "value": 100,

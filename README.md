@@ -39,6 +39,11 @@
 
 خيار **دقة العرض** الجديد: تلقائي (حسب الشاشة وكرت الشاشة) أو 720p أو 1080p أو 1440p أو 4K.
 
+### 🛰️ خرائط حقيقية للكواكب (2.3)
+خيار **خرائط حقيقية للكواكب** (مفعّل افتراضياً مع النمط الواقعي) يكسو الكواكب والشمس بخرائط مبنية على صور ناسا، وفوقها غيوم الأرض المتحركة وأضواء مدنها وتفاصيل إضافية عند الاقتراب. إذا عطّلته ترجع الأسطح المرسومة برمجياً.
+
+تظهر الكواكب فوراً بنسخة خفيفة، ثم تتحول تلقائياً إلى النسخة المفصّلة بعد ثوانٍ من أول تشغيل، بدون أي تجميد.
+
 ![Planet detail](docs/screenshots/planets-detail.jpg)
 
 ### نسخة الويب ونسخة سطح المكتب
@@ -184,6 +189,10 @@ Click the **⚙** button under the clock to open a side panel with **every** opt
 - **Speed:** auto performance (dynamic resolution), rendering up to 4K, and the black hole is shaded only where it is on screen.
 - **Two builds:** the website has every tool; the Lively ZIP keeps the eye and sound and is configured from Lively's Customize panel.
 
+### 2.3: photographic planet maps
+- **Photographic planet maps** (on by default with the Realistic style): the planets and the Sun use 2K maps based on NASA imagery, with animated Earth clouds, city lights and extra close-up detail on top. Turn it off to get the procedural surfaces back.
+- Planet shaders are now one small program per body, with a light build shown at once and the detailed build compiled in the background, so the first start no longer stalls.
+
 ### 2.2: detailed planets and resolution presets
 - Surfaces gain detail as the camera gets close: cratered relief on Mercury and Mars, Earth's mountains, coasts, clouds and city lights, Jupiter's bands and swirling Great Red Spot, solar granulation and sunspots. All procedural, so it stays sharp at any resolution.
 - **Output resolution** option: Auto (from screen and GPU class), 720p, 1080p, 1440p or 4K.
@@ -215,6 +224,7 @@ style.css               glass HUD styling
 shaders.js              all GLSL ES 3.00 shaders
 script.js               engine: simulation, camera director, renderer, Lively bridge
 stories.js              the six deep-sky stories
+textures/               2K planet maps (CC BY 4.0, Solar System Scope); embedded as maps.js in the ZIP
 settings.js             on-screen ⚙ settings panel (web build only)
 web.js                  toolbar: eye and sound (both builds), export and fullscreen (web only)
 props.js                generated from LivelyProperties.json by tools/build.py
@@ -229,6 +239,8 @@ To rebuild after editing, run `python tools/build.py`. It regenerates `props.js`
 
 ## 📜 License
 [MIT](LICENSE). Free to use, share and modify; please keep the credit.
+
+The planet and Sun maps in `textures/` are from [Solar System Scope](https://www.solarsystemscope.com/textures/), licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) and based on NASA data. They keep that license; see `textures/CREDITS.txt`.
 
 **© 2026 Yousif Anwar Alkmali — يوسف أنور الكمالي — r3dmof3@gmail.com**
 
