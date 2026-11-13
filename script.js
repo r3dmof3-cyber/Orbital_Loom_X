@@ -21,7 +21,7 @@ const S = {
   trailStyle: 0, trailColor: 0, orbitModel: 0, planetStyle: 0, planetScale: 1, waveAmplitude: 40, waveCount: 4,
   background: 0, quality: 1, renderScale: 1, fpsLimit: 1, bloom: 1, exposure: 1, cinematicFx: true,
   showLabels: true, showDropLines: true, showExtinctions: true, showGalaxyGrid: true, heliosphere: 0,
-  hudLayout: 0, hudOpacity: 0.9, showClock: true, accent: '#F5B94A', audioReactive: true, mouseParallax: true,
+  hudLayout: 0, hudOpacity: 0.9, showClock: true, accent: '#F5B94A', audioReactive: true, mouseParallax: true, directorStories: true, autoPerf: true,
 };
 
 /* ───────────────────────── world constants ───────────────────────── */
@@ -63,14 +63,24 @@ const SHOTS = [
   { id: 'helio',   tc: 0,    frame: 'm', yaw: 2.05, pitch: 0.30, dist: 330,  rate: 0.32, trail: 14,  gain: 0.45,  drift: 0.18, helio: 1, fabric: 0, grid: 0, ext: 0 },
   { id: 'fabric',  tc: 0,    frame: 'f', yaw: 0.50, pitch: 0.78, dist: 104,  rate: 0.22, trail: 3,   gain: 0.0,  drift: 0.20, helio: 0, fabric: 1, grid: 0, ext: 0 },
   { id: 'free',    tc: 0,    frame: 'm', yaw: 0.90, pitch: 0.35, dist: 90,   rate: 0.35, trail: 10,  gain: 1.0,  drift: 0.0,  helio: 0, fabric: 0, grid: 0, ext: 0 },
+  /* deep-sky stories: drawn by stories.js in their own space centred on the origin */
+  { id: 'pulsar',   story: 'pulsar',   tc: 1, frame: 'w', yaw: 0.6, pitch: 0.24, dist: 120, rate: 0.3, trail: 7, gain: 0, drift: 0.25, helio: 0, fabric: 0, grid: 0, ext: 0 },
+  { id: 'trappist', story: 'trappist', tc: 1, frame: 'w', yaw: 0.4, pitch: 0.52, dist: 78,  rate: 0.3, trail: 7, gain: 0, drift: 0.20, helio: 0, fabric: 0, grid: 0, ext: 0 },
+  { id: 'kilonova', story: 'kilonova', tc: 1, frame: 'w', yaw: 0.5, pitch: 0.62, dist: 100, rate: 0.3, trail: 7, gain: 0, drift: 0.20, helio: 0, fabric: 0, grid: 0, ext: 0 },
+  { id: 'threebody',story: 'threebody',tc: 1, frame: 'w', yaw: 0.3, pitch: 0.78, dist: 112, rate: 0.3, trail: 7, gain: 0, drift: 0.18, helio: 0, fabric: 0, grid: 0, ext: 0 },
+  { id: 'ton618',   story: 'ton618',   tc: 1, frame: 'w', yaw: 1.5708, pitch: 0.10, dist: 560, rate: 0.3, trail: 7, gain: 0, drift: 0.10, still: 1, helio: 0, fabric: 0, grid: 0, ext: 0 },
+  { id: 'sizes',    story: 'sizes',    tc: 1, frame: 'w', yaw: 1.5708, pitch: 0.06, dist: 1,  rate: 0.3, trail: 7, gain: 0, drift: 0.05, still: 1, helio: 0, fabric: 0, grid: 0, ext: 0 },
 ];
-const DIRECTOR_ORDER = [1, 2, 5, 3, 4, 3, 6];
+const DIRECTOR_SOLAR = [1, 2, 5, 3, 4, 3, 6], DIRECTOR_ALL = [1, 2, 8, 5, 3, 9, 4, 10, 6, 12, 3, 11, 13];
+let DIRECTOR_ORDER = DIRECTOR_ALL;
+const storyOf = (i) => (SHOTS[i] && SHOTS[i].story) || null;
 
 /* ───────────────────────── i18n ───────────────────────── */
 const T = {
   ar: {
     subtitle: 'رحلة المجموعة الشمسية عبر مجرة درب التبانة',
-    modes: ['المخرج السينمائي', 'الدوامة الحلزونية', 'المنظور الجانبي', 'الرحلة المجرية', 'الثقب الأسود A*', 'الغلاف الشمسي', 'نسيج الزمكان', 'كاميرا حرة'],
+    modes: ['المخرج السينمائي', 'الدوامة الحلزونية', 'المنظور الجانبي', 'الرحلة المجرية', 'الثقب الأسود A*', 'الغلاف الشمسي', 'نسيج الزمكان', 'كاميرا حرة', 'النجم الطارق (النابض)', 'ترابيست-1', 'كيلونوفا', 'ثلاثة ثقوب سوداء', 'العملاق TON 618', 'موكب الأحجام'],
+    tabs: ['الرحلة', 'قصص كونية'],
     shots: {
       vortex: ['الدوامة الحلزونية', 'الشمس لا تقف ساكنة؛ إنها تندفع بنحو 230 كم/ث حول مركز المجرة، فترسم الكواكب حولها لوالب ممتدة بدلاً من دوائر مغلقة.'],
       side: ['المنظور الجانبي', 'يميل مستوى مدارات الكواكب نحو 60° عن قرص المجرة، فيرسم كل كوكب لولباً يتسع كلما ابتعد عن الشمس وأبطأ في دورانه.'],
@@ -79,10 +89,16 @@ const T = {
       helio: ['فقاعة الغلاف الشمسي', 'تنفخ الرياح الشمسية فقاعة واقية تشقّ الوسط بين النجمي كمقدمة سفينة، تاركةً خلفها ذيلاً طويلاً.'],
       fabric: ['نسيج الزمكان', 'تمثيل تخيلي: كتلة الشمس تحني الزمكان فتصنع بئراً عميقاً، والكواكب في سقوط حر دائم حوله — وهذا هو المدار.'],
       free: ['الكاميرا الحرة', 'اسحب للتدوير • العجلة للتقريب • انقر على كوكب لتتبّعه • نقرتان لإعادة الضبط'],
+      pulsar: ['النجم الطارق — النجم النابض', 'جثة نجم منهار بحجم مدينة وكتلة تفوق الشمس، يدور حول نفسه مرات كثيرة في الثانية، وتكنس حزمتاه الفضاء كمنارة؛ فنلتقط منه طَرْقاً منتظماً أدقّ من أفضل الساعات.'],
+      trappist: ['ترابيست-1 — سبعة عوالم', 'على بعد 40 سنة ضوئية فقط، قزم أحمر صغير تدور حوله سبعة كواكب بحجم الأرض، كلها أقرب إليه من عطارد إلى شمسنا، وثلاثة منها في المنطقة الصالحة للحياة.'],
+      kilonova: ['كيلونوفا — مصنع الذهب', 'نجمان نيوترونيان يدوران حول بعضهما، وتحمل أمواج الجاذبية طاقتهما بعيداً فيقتربان ويتسارعان حتى يندمجا في انفجار يصنع الذهب والبلاتين.'],
+      threebody: ['ثلاثة ثقوب سوداء — مسألة الأجسام الثلاثة', 'جسمان يرقصان في مدار منتظم، لكن بإضافة جسم ثالث تصير الحركة فوضوية لا يمكن التنبؤ بها على المدى البعيد، وكثيراً ما تنتهي بقذف أحد الثلاثة بعيداً.'],
+      ton618: ['TON 618 — عملاق الثقوب السوداء', 'ثقب أسود كتلته نحو 66 مليار شمس. أفق حدثه يتسع لمجموعتنا الشمسية أكثر من أربعين مرة؛ مدار نبتون كله يبدو نقطة صغيرة أمامه.'],
+      sizes: ['موكب الأحجام', 'الأحجام الحقيقية جنباً إلى جنب: من عطارد الصغير إلى المشتري الذي يتسع لأكثر من 1300 أرض، ثم الشمس التي تتسع لمليون وثلاثمئة ألف أرض.'],
       follow: ['تتبّع', 'تتبع الكاميرا الآن هذا الكوكب في مساره اللولبي — انقر في الفراغ أو اضغط Esc للعودة.'],
     },
     tele: 'قياسات الرحلة', speed: 'سرعة الشمس المدارية', height: 'الارتفاع عن قرص المجرة', gtime: 'الزمن المجري المنقضي',
-    dist: 'المسافة المقطوعة', lon: 'الزاوية المجرية', years: 'سنوات مدارية (عرض)',
+    dist: 'المسافة المقطوعة', lon: 'الزاوية المجرية', moved: 'قطعتَ منذ فتح الصفحة',
     ly: 'سنة ضوئية', kly: 'ألف س.ض', myr: 'مليون سنة', north: 'شمال', south: 'جنوب',
     sun: 'الشمس', sunD: '≈ 230 كم/ث حول المجرة', solar: 'المجموعة الشمسية', bh: 'الرامي A*', bhD: '4.3 مليون كتلة شمسية',
     dir: 'اتجاه حركة الشمس', today: 'الحاضر', ago: 'م.س مضت',
@@ -92,7 +108,8 @@ const T = {
   },
   en: {
     subtitle: 'The Solar System’s voyage through the Milky Way',
-    modes: ['Cinematic Director', 'Helical Vortex', 'Side Profile', 'Galactic Voyage', 'Black Hole A*', 'Heliosphere', 'Spacetime Fabric', 'Free Camera'],
+    modes: ['Cinematic Director', 'Helical Vortex', 'Side Profile', 'Galactic Voyage', 'Black Hole A*', 'Heliosphere', 'Spacetime Fabric', 'Free Camera', 'Pulsar (Al-Tariq)', 'TRAPPIST-1', 'Kilonova', 'Three Black Holes', 'Giant TON 618', 'Parade of Sizes'],
+    tabs: ['Voyage', 'Cosmic stories'],
     shots: {
       vortex: ['Helical Vortex', 'The Sun is never still: racing ~230 km/s around the galactic centre, it drags every planet into a stretched helix instead of a closed loop.'],
       side: ['Side Profile', 'The planets’ orbital plane is tilted ~60° to the galactic disc, so each world traces a helix that widens with distance and slower orbits.'],
@@ -101,10 +118,16 @@ const T = {
       helio: ['The Heliosphere', 'The solar wind inflates a protective bubble that ploughs through the interstellar medium like a bow, trailing a long heliotail.'],
       fabric: ['Spacetime Fabric', 'An illustrative embedding: the Sun’s mass curves spacetime into a deep well — the planets are in endless free fall around it. That is an orbit.'],
       free: ['Free Camera', 'Drag to orbit • Wheel to zoom • Click a planet to follow • Double-click to reset'],
+      pulsar: ['Pulsar — the knocking star', 'The collapsed core of a dead star: city-sized, heavier than the Sun, spinning many times a second. Its twin beams sweep space like a lighthouse, giving a beat steadier than our best clocks.'],
+      trappist: ['TRAPPIST-1 — seven worlds', 'Just 40 light-years away, a tiny red dwarf hosts seven Earth-size planets. All orbit closer than Mercury does to our Sun, and three sit in the habitable zone.'],
+      kilonova: ['Kilonova — the gold factory', 'Two neutron stars circle each other. Gravitational waves carry their energy away, so they spiral in faster and faster until they merge in a blast that forges gold and platinum.'],
+      threebody: ['Three black holes — the three-body problem', 'Two bodies waltz in a regular orbit. Add a third and the motion turns chaotic and unpredictable in the long run, often ending with one of the three flung away.'],
+      ton618: ['TON 618 — the giant', 'A black hole of about 66 billion Suns. Its event horizon could hold our Solar System more than forty times over; Neptune’s whole orbit is a small dot in front of it.'],
+      sizes: ['Parade of Sizes', 'True sizes side by side: from little Mercury to Jupiter, which could hold more than 1,300 Earths, and then the Sun, which could hold 1.3 million.'],
       follow: ['Following', 'The camera now rides this planet along its helix — click empty space or press Esc to return.'],
     },
     tele: 'Voyage telemetry', speed: 'Solar orbital speed', height: 'Height above disc', gtime: 'Galactic time elapsed',
-    dist: 'Distance travelled', lon: 'Galactic angle', years: 'Orbital years (display)',
+    dist: 'Distance travelled', lon: 'Galactic angle', moved: 'You moved since opening',
     ly: 'ly', kly: 'k ly', myr: 'Myr', north: 'N', south: 'S',
     sun: 'Sun', sunD: '≈ 230 km/s around the galaxy', solar: 'Solar System', bh: 'Sagittarius A*', bhD: '4.3 million solar masses',
     dir: 'Direction of Sun’s motion', today: 'Present day', ago: 'Myr ago',
@@ -366,14 +389,22 @@ const nebula = (() => {
 })();
 
 let W = 1, Hh = 1, pxScale = 1, scene = null, bloom = [];
+const MAX_PIXELS = 3840 * 2160;
+let drs = 1, fixedSize = null;   // dynamic resolution scale (auto performance) and export override
 function resize() {
-  document.documentElement.style.setProperty('--s', clamp(window.innerHeight / 1080, 0.7, 2.2).toFixed(3));
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const w = Math.max(2, Math.round(window.innerWidth * dpr * S.renderScale));
-  const h = Math.max(2, Math.round(window.innerHeight * dpr * S.renderScale));
+  const iw = window.innerWidth, ih = window.innerHeight;
+  const portrait = iw < ih * 0.8;
+  document.documentElement.style.setProperty('--s', (portrait ? clamp(iw / 520, 0.62, 1.1) : clamp(ih / 1080, 0.7, 2.2)).toFixed(3));
+  document.body.classList.toggle('portrait', portrait);
+  const dpr = Math.min(window.devicePixelRatio || 1, 3);
+  let w = Math.max(64, Math.round(iw * dpr * S.renderScale * drs));
+  let h = Math.max(64, Math.round(ih * dpr * S.renderScale * drs));
+  const cap = Math.sqrt(MAX_PIXELS / (w * h));           // never exceed a 4K frame
+  if (cap < 1) { w = Math.round(w * cap); h = Math.round(h * cap); }
+  if (fixedSize) { w = fixedSize[0]; h = fixedSize[1]; }
   if (w === W && h === Hh && scene) return;
   W = w; Hh = h; canvas.width = w; canvas.height = h;
-  pxScale = h / 1080;
+  pxScale = Math.min(h, w * 0.9) / 1080;
   freeTarget(scene); bloom.forEach(freeTarget); bloom = [];
   scene = makeTarget(w, h, true);
   let bw = w >> 1, bh = h >> 1;
@@ -459,8 +490,12 @@ const cam = {
 let activeShot = 1, directorIdx = 0, shotTimer = 0;
 
 function currentShotId() { return S.viewMode === 0 ? DIRECTOR_ORDER[directorIdx % DIRECTOR_ORDER.length] : S.viewMode; }
+let fade = 1, fadeDir = 0, pendingShot = -1;
 function setShot(id, instant) {
-  activeShot = id; shotTimer = 0;
+  if (!instant && storyOf(id) !== storyOf(activeShot)) { pendingShot = id; fadeDir = -1; shotTimer = 0; return; }   // cut through black
+  activeShot = id; shotTimer = 0; cam.storyDist = 1;
+  document.body.classList.toggle('story', !!storyOf(id));
+  if (storyOf(id)) instant = true;
   cam.userYaw *= 0.0; cam.userPitch = 0; cam.zoom = 0;
   updateCaption(true);
   updateModeButtons();
@@ -476,6 +511,12 @@ function setShot(id, instant) {
 function expK(dt, rate) { return 1 - Math.exp(-dt * rate); }
 
 function updateSim(dt) {
+  sim.dtReal = dt;
+  if (fadeDir) {
+    fade = clamp(fade + fadeDir * dt / 0.5, 0, 1);
+    if (fadeDir < 0 && fade === 0) { const id = pendingShot; pendingShot = -1; fadeDir = 1; setShot(id, true); if (!storyOf(id)) buildTelemetry(); }
+    else if (fadeDir > 0 && fade === 1) fadeDir = 0;
+  }
   // director
   if (S.viewMode === 0 && cam.followIdx < 0) {
     shotTimer += dt;
@@ -517,12 +558,13 @@ function updateSim(dt) {
   }
   cam.pX = lerp(cam.pX, S.mouseParallax ? cam.hoverX : 0, expK(dt, 2));
   cam.pY = lerp(cam.pY, S.mouseParallax ? cam.hoverY : 0, expK(dt, 2));
-  const drift = Math.sin(sim.realTime * 0.045) * shot.drift + (shot.frame === 'w' ? sim.realTime * 0.02 : 0);
+  const drift = Math.sin(sim.realTime * 0.045) * shot.drift + (shot.frame === 'w' && !shot.still ? sim.realTime * 0.02 : 0);
   const yawT = shot.yaw + drift + cam.userYaw + cam.pX * 0.12;
   const pitchT = clamp(shot.pitch + cam.userPitch - cam.pY * 0.06, -1.35, 1.35);
   const following = cam.followIdx >= 0;
   let distT = shot.dist;
   if (following) distT = Math.max(PLANETS[cam.followIdx].size * S.planetScale * 14, PLANETS[cam.followIdx].R * 1.4 + 8);
+  if (shot.story) distT *= cam.storyDist || 1;
   distT *= Math.exp(cam.zoom);
   cam.yaw.step(yawT, dt, 1.25, true);
   cam.pitch.step(pitchT, dt, 1.25);
@@ -568,7 +610,8 @@ function computeCamera(F) {
   U = v3.norm(U);
   X = v3.norm(v3.sub(X, v3.mul(U, v3.dot(X, U))));
   const Z = v3.cross(X, U);
-  const y = cam.yaw.x, p = cam.pitch.x, d = Math.exp(cam.logDist.x);
+  const aspect0 = W / Hh;
+  const y = cam.yaw.x, p = cam.pitch.x, d = Math.exp(cam.logDist.x) * (aspect0 < 1 ? Math.min(2.4, Math.pow(1 / aspect0, 0.8)) : 1);
   const dir = v3.add(v3.add(v3.mul(X, Math.cos(p) * Math.cos(y)), v3.mul(Z, Math.cos(p) * Math.sin(y))), v3.mul(U, Math.sin(p)));
   const eye = v3.add(target, v3.mul(dir, d));
   const la = lookAt(eye, target, U);
@@ -653,6 +696,13 @@ function render() {
     gl.bindVertexArray(emptyVAO);
   }
 
+  const story = storyOf(activeShot);
+  if (story && window.OLX_STORIES) {
+    screenPlanets.length = 0;
+    window.OLX_STORIES.draw(story, { fwd, right, up, accent, W, Hh, pxScale, dt: sim.paused ? 0 : (sim.dtReal || 0.016) * S.timeSpeed });
+    gl.bindVertexArray(emptyVAO);
+  } else {
+  if (window.OLX_STORIES) window.OLX_STORIES.idle();
   // ── opaque bodies (premultiplied, depth written per pixel) ──
   gl.enable(gl.DEPTH_TEST); gl.depthFunc(gl.LEQUAL); gl.depthMask(true);
   gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
@@ -684,9 +734,16 @@ function render() {
     const cz = pr[10] * z + pr[14], cw = pr[11] * z + pr[15];
     const depth = cw > 0 ? clamp((cz / cw) * 0.5 + 0.5, 0, 1) : 1;
     if (cw > 0 || bhD < RS * 16) {
+      if (bhD > RS * 30 && cw > 0) {   // far away: only shade the pixels around the hole
+        const ndcX = (pr[0] * cv[0] + pr[8] * cv[2]) / -cv[2], ndcY = (pr[5] * cv[1] + pr[9] * cv[2]) / -cv[2];
+        const rpx = RS * 15 * cam.focal / Math.max(-cv[2] - RS * 14, 1) + 8;
+        const x0 = Math.max(0, Math.floor((ndcX * 0.5 + 0.5) * W - rpx)), y0 = Math.max(0, Math.floor((ndcY * 0.5 + 0.5) * Hh - rpx));
+        gl.enable(gl.SCISSOR_TEST); gl.scissor(x0, y0, Math.ceil(rpx * 2), Math.ceil(rpx * 2));
+      }
       use(P.bh, { uCam: cam.eye, uFwd: fwd, uRight: right, uUp: up, uTan: [cam.tanX, cam.tanY], uRs: RS, uTime: (sim.realTime % 4000) + sim.T * 0.15,
         uDiskIn: 3.0, uDiskOut: 11.5, uDepth: depth, uBoost: 1 + sim.audio * 0.5, uBound: 13.0 });
       gl.drawArrays(gl.TRIANGLES, 0, 3);
+      gl.disable(gl.SCISSOR_TEST);
     }
   }
 
@@ -754,7 +811,7 @@ function render() {
   if (cam.fabric > 0.01) {
     gl.bindVertexArray(fabricMesh.vao);
     use(P.fabric, { uVP: cam.vp, uSun: F.Sun, uE1: F.r, uE2: F.e2, uN: F.nF, uL: FAB_L, uMass: fabM, uSpacing: 2.4, uGain: cam.fabric, uDK: cam.fabric,
-      uTime: sim.realTime, uScroll: [0, -sim.scrollY], uColor: [0.55, 0.32, 1.0], uOrb: PLANETS.map((p) => p.R) });
+      uTime: sim.realTime, uScroll: [0, -sim.scrollY], uColor: [0.55, 0.32, 1.0], uOrb: PLANETS.map((p) => p.R), uWave: [0, 0, 0, 0] });
     gl.drawElements(gl.TRIANGLES, fabricMesh.count, gl.UNSIGNED_INT, 0);
     gl.bindVertexArray(emptyVAO);
   }
@@ -783,6 +840,8 @@ function render() {
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
 
+  }
+  gl.disable(gl.SCISSOR_TEST);
   gl.depthMask(true);
   gl.disable(gl.DEPTH_TEST);
 
@@ -818,13 +877,15 @@ function render() {
   gl.viewport(0, 0, W, Hh);
   gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, scene.tex);
   gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, bloom[0].tex);
-  use(P.comp, { uScene: 0, uBloom: 1, uBloomStr: fx ? S.bloom * 0.16 : 0, uExposure: S.exposure * 1.05, uTime: sim.realTime,
+  use(P.comp, { uScene: 0, uBloom: 1, uBloomStr: fx ? S.bloom * 0.16 : 0, uExposure: S.exposure * 1.05 * fade * fade, uTime: sim.realTime,
     uGrain: S.cinematicFx ? 1 : 0, uVig: S.cinematicFx ? 0.55 : 0.15, uCA: S.cinematicFx ? 0.012 : 0, uRes: [W, Hh] });
   gl.drawArrays(gl.TRIANGLES, 0, 3);
   gl.activeTexture(gl.TEXTURE0);
 
   updateLabels(F, sunPos);
+  if (hooks.onFrame) hooks.onFrame();
 }
+const hooks = { onFrame: null };
 function basisMat(b) { return new Float32Array([b.a1[0], b.a1[1], b.a1[2], b.a2[0], b.a2[1], b.a2[2], b.axis[0], b.axis[1], b.axis[2]]); }
 
 /* ───────────────────────── labels ───────────────────────── */
@@ -854,13 +915,14 @@ function setLabelText() {
   });
 }
 function place(el, p, alpha, dx, dy, center) {
+  el._n = p ? { x: p.x / window.innerWidth, y: p.y / window.innerHeight, a: alpha } : null;
   if (!p || alpha < 0.02) { el.style.opacity = 0; return; }
   const x = p.x + (dx || 0), y = p.y + (dy || 0);
   el.style.transform = center ? `translate(${x}px, ${y}px) translate(-50%, -100%)` : `translate(${x}px, ${y}px) translate(0, -50%)`;
   el.style.opacity = alpha.toFixed(3);
 }
 function updateLabels(F, sunPos) {
-  const show = S.showLabels && S.hudLayout !== 2 ? 1 : 0;
+  const show = S.showLabels && S.hudLayout !== 2 && !storyOf(activeShot) ? fade : 0;
   const vp = cam.vp, d = cam.dist;
   const near = show * clamp((620 - d) / 260, 0, 1);
   const s = Math.max(0.75, window.innerHeight / 1080);
@@ -914,15 +976,24 @@ function applyLanguage() {
   $('teleTitle').textContent = bi() ? `${T.ar.tele} · ${T.en.tele}` : l.tele;
   buildModes(); buildLegend(); buildTelemetry(); setLabelText(); updateCaption(true);
 }
-const MODE_ICONS = ['🎬', '🌀', '〰', '🌌', '⚫', '🫧', '🕸', '🖱'];
+const MODE_ICONS = ['🎬', '🌀', '〰', '🌌', '⚫', '🫧', '🕸', '🖱', '✦', '🔴', '💥', '☯', '🕳', '📏'];
+let modeTab = 0;
 function buildModes() {
   const l = L(), el = $('modes');
   el.innerHTML = '';
+  const tabs = document.createElement('div'); tabs.className = 'mode-tabs';
+  l.tabs.forEach((t, i) => {
+    const b = document.createElement('button'); b.className = 'mode-tab' + (i === modeTab ? ' on' : ''); b.textContent = bi() ? T.ar.tabs[i] : t;
+    b.addEventListener('click', (e) => { e.stopPropagation(); modeTab = i; buildModes(); });
+    tabs.appendChild(b);
+  });
+  el.appendChild(tabs);
   l.modes.forEach((name, i) => {
+    if ((i >= 8 ? 1 : 0) !== modeTab) return;
     const b = document.createElement('button');
     b.className = 'mode-btn';
     b.dataset.mode = i;
-    b.innerHTML = `<span class="ic">${MODE_ICONS[i]}</span><span class="lb">${bi() ? `${T.ar.modes[i]}<em class="en2">${T.en.modes[i]}</em>` : name}</span><span class="k">${i}</span>`;
+    b.innerHTML = `<span class="ic">${MODE_ICONS[i]}</span><span class="lb">${bi() ? `${T.ar.modes[i]}<em class="en2">${T.en.modes[i]}</em>` : name}</span><span class="k">${i < 8 ? i : ''}</span>`;
     b.addEventListener('click', (e) => { e.stopPropagation(); selectMode(i); });
     el.appendChild(b);
   });
@@ -948,7 +1019,7 @@ function buildLegend() {
     el.appendChild(r);
   });
 }
-const teleKeys = ['speed', 'height', 'gtime', 'dist', 'lon', 'years'];
+const teleKeys = ['speed', 'height', 'gtime', 'dist', 'lon', 'moved'];
 function buildTelemetry() {
   const l = L(), g = $('teleGrid');
   g.innerHTML = '';
@@ -984,6 +1055,7 @@ function updateHud(dt) {
   hudTimer = 0;
   if (fpsAcc > 1) { fps = fpsN / fpsAcc; fpsAcc = 0; fpsN = 0; }
   const l = L();
+  if (storyOf(activeShot) && window.OLX_STORIES) window.OLX_STORIES.hud(storyOf(activeShot), $('teleGrid'), S.language);
   const F = frameAt(sim.theta);
   const h = S.waveAmplitude > 0 ? F.Sun[1] / S.waveAmplitude * 85 : 0;
   const gMyr = (sim.thetaU - THETA0) / TAU * GAL_YEAR_MYR;
@@ -994,8 +1066,8 @@ function updateHud(dt) {
   set('gtime', `${fmt(gMyr, 2)} <small>${l.myr}</small>`);
   set('dist', ly > 10000 ? `${fmt(ly / 1000, 1)} <small>${l.kly}</small>` : `${fmt(ly, 0)} <small>${l.ly}</small>`);
   set('lon', `${fmt(((sim.thetaU - THETA0) * 180 / Math.PI) % 360, 2)}°`);
-  set('years', `${fmt(sim.T, 1)}`);
-  $('teleFoot').textContent = `${Math.round(fps)} FPS · ${W}×${Hh} · ${HAS_FLOAT ? 'HDR16F' : 'LDR'} · ${(galaxy.nAdd / 1000).toFixed(0)}k ★${sim.paused ? ' · ⏸' : ''}`;
+  set('moved', `<span class="a">${fmt(230 * sim.realTime, 0)}</span> <small>km</small>`);
+  $('teleFoot').textContent = `${Math.round(fps)} FPS · ${W}×${Hh}${drs < 0.99 ? ' (auto ' + Math.round(drs * 100) + '%)' : ''} · ${HAS_FLOAT ? 'HDR16F' : 'LDR'} · ${(galaxy.nAdd / 1000).toFixed(0)}k ★${sim.paused ? ' · ⏸' : ''}`;
   drawWave(F);
   // clock
   const now = new Date();
@@ -1042,12 +1114,14 @@ function applyHud() {
 
 /* ───────────────────────── interaction ───────────────────────── */
 function selectMode(i) {
-  S.viewMode = clamp(i | 0, 0, 7);
+  S.viewMode = clamp(i | 0, 0, SHOTS.length - 1);
   cam.followIdx = -1;
+  const tab = S.viewMode >= 8 ? 1 : 0; if (tab !== modeTab && S.viewMode !== 0) { modeTab = tab; buildModes(); }
   if (S.viewMode === 0) { directorIdx = 0; setShot(DIRECTOR_ORDER[0]); } else setShot(S.viewMode);
   window.dispatchEvent(new CustomEvent('olx:prop', { detail: { name: 'viewMode', value: S.viewMode } }));
 }
 function followPlanet(i) {
+  if (storyOf(activeShot)) { cam.followIdx = -1; return; }
   if (i >= 0) { cam.followIdx = i; cam.lastFollow = i; cam.zoom = 0; cam.userYaw = 0; cam.userPitch = 0; toast(L().toastFollow + (S.language === 1 ? PLANETS[i].en : PLANETS[i].ar)); }
   else cam.followIdx = -1;
   updateCaption(true);
@@ -1068,6 +1142,13 @@ canvas.addEventListener('pointerup', (e) => {
   if (drag && !drag.moved) pick(e.clientX, e.clientY);
   drag = null;
 });
+const touches = new Map(); let pinch0 = 0;
+canvas.addEventListener('pointerdown', (e) => { touches.set(e.pointerId, e); if (touches.size === 2) { const [a, b] = [...touches.values()]; pinch0 = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY); drag = null; } });
+canvas.addEventListener('pointermove', (e) => {
+  if (!touches.has(e.pointerId)) return; touches.set(e.pointerId, e);
+  if (touches.size === 2) { const [a, b] = [...touches.values()]; const d = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY); if (pinch0 > 0) cam.zoom = clamp(cam.zoom - Math.log(d / pinch0), -2.2, 2.4); pinch0 = d; cam.idle = 0; drag = null; }
+});
+['pointerup', 'pointercancel'].forEach((t) => canvas.addEventListener(t, (e) => { touches.delete(e.pointerId); }));
 canvas.addEventListener('wheel', (e) => { cam.zoom = clamp(cam.zoom + Math.sign(e.deltaY) * 0.12, -2.2, 2.4); cam.idle = 0; }, { passive: true });
 canvas.addEventListener('dblclick', () => { cam.userYaw = 0; cam.userPitch = 0; cam.zoom = 0; followPlanet(-1); });
 function pick(x, y) {
@@ -1088,6 +1169,8 @@ window.addEventListener('keydown', (e) => {
   else if (k === 'l') window.livelyPropertyListener('showLabels', !S.showLabels);
   else if (k === 'r') { cam.userYaw = 0; cam.userPitch = 0; cam.zoom = 0; followPlanet(-1); }
   else if (k === 'escape') followPlanet(-1);
+  else if (k === ']') selectMode(S.viewMode >= SHOTS.length - 1 ? 1 : S.viewMode + 1);
+  else if (k === '[') selectMode(S.viewMode <= 1 ? SHOTS.length - 1 : S.viewMode - 1);
   else if (k === 'arrowright') followPlanet((cam.followIdx + 1) % 8);
   else if (k === 'arrowleft') followPlanet((cam.followIdx + 7) % 8);
 });
@@ -1112,7 +1195,9 @@ window.livelyPropertyListener = function (name, val) {
     case 'waveCount': S.waveCount = clamp(Math.round(n), 1, 12); break;
     case 'background': S.background = clamp(n | 0, 0, 2); break;
     case 'quality': S.quality = clamp(n | 0, 0, 3); buildGalaxy(); break;
-    case 'renderScale': S.renderScale = clamp(n / 100, 0.3, 1); resize(); break;
+    case 'renderScale': S.renderScale = clamp(n / 100, 0.3, 2); resize(); break;
+    case 'directorStories': S.directorStories = bool(val); DIRECTOR_ORDER = S.directorStories ? DIRECTOR_ALL : DIRECTOR_SOLAR; directorIdx = 0; if (S.viewMode === 0) setShot(DIRECTOR_ORDER[0]); break;
+    case 'autoPerf': S.autoPerf = bool(val); if (!S.autoPerf) { drs = 1; resize(); } break;
     case 'fpsLimit': S.fpsLimit = clamp(n | 0, 0, 2); break;
     case 'bloom': S.bloom = clamp(n / 100, 0, 3); break;
     case 'exposure': S.exposure = clamp(n / 100, 0.2, 3); break;
@@ -1157,6 +1242,22 @@ function frame(now) {
   updateSim(dt);
   render();
   updateHud(dt);
+  autoPerf(dt);
+}
+/* dynamic resolution: drop the render scale when frames run long, creep back up when there is headroom */
+let apT = 0, apN = 0, apSlow = 0, apCool = 0, apCeil = 1;
+function autoPerf(dt) {
+  if (!S.autoPerf || fixedSize) return;
+  apT += dt; apN++;
+  if (apT < 1.5) return;
+  const avg = apT / apN, target = 1 / ([30, 60, 60][S.fpsLimit] || 60);
+  apT = 0; apN = 0; apCool = Math.max(0, apCool - 1);
+  if (avg > target * 1.22) {
+    if (++apSlow >= 2 && drs > 0.5) { apCeil = Math.max(0.5, drs * 0.97); drs = Math.max(0.5, drs * 0.85); apSlow = 0; apCool = 8; resize(); }
+  } else {
+    apSlow = 0;
+    if (avg < target * 1.06 && drs < 1 && apCool === 0) { drs = Math.min(1, drs * 1.08); if (drs > apCeil) { apCeil = Math.min(1, apCeil * 1.04); apCool = 14; } resize(); }
+  }
 }
 
 canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); }, false);
@@ -1171,9 +1272,12 @@ applyHud();
 applyLanguage();
 if (URLP.has('lang')) window.livelyPropertyListener('language', +URLP.get('lang'));
 if (URLP.has('hud')) window.livelyPropertyListener('hudLayout', +URLP.get('hud'));
-if (URLP.has('shot')) { S.viewMode = +URLP.get('shot'); setShot(S.viewMode === 0 ? DIRECTOR_ORDER[0] : S.viewMode, true); }
+if (URLP.has('shot')) { S.viewMode = +URLP.get('shot'); modeTab = S.viewMode >= 8 ? 1 : 0; buildModes(); setShot(S.viewMode === 0 ? DIRECTOR_ORDER[0] : S.viewMode, true); }
 else setShot(DIRECTOR_ORDER[0], true);
 if (URLP.has('t')) { const t = +URLP.get('t'); for (let i = 0; i < t * 30; i++) updateSim(1 / 30); }
-window.__olx = { S, sim, cam, setShot, selectMode, followPlanet };
+window.__olx = { S, sim, cam, setShot, selectMode, followPlanet, gl, program, use, P, emptyVAO, drawBody, basisMat, mulPoint, mulDir, v3, project,
+  fabricMesh, T, SHOTS, labelLayer, hooks, render, resize, canvas, clamp, lerp, PLANETS,
+  size: () => [W, Hh], shot: () => activeShot, fade: () => fade, lang: () => S.language,
+  setFixedSize: (sz) => { fixedSize = sz; resize(); }, renderNow: () => { updateSim(0); render(); } };
 requestAnimationFrame(frame);
 })();

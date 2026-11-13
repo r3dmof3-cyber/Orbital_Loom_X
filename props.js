@@ -22,8 +22,19 @@ window.LIVELY_PROPS = {
    "⚫ الثقب الأسود الرامي A* / Sagittarius A*",
    "🫧 فقاعة الغلاف الشمسي / Heliosphere",
    "🕸️ نسيج الزمكان / Spacetime Fabric",
-   "🖱️ كاميرا حرة / Free Camera"
+   "🖱️ كاميرا حرة / Free Camera",
+   "✦ النجم الطارق (النابض) / Pulsar",
+   "🔴 ترابيست-1 / TRAPPIST-1",
+   "💥 كيلونوفا / Kilonova",
+   "☯ ثلاثة ثقوب سوداء / Three Black Holes",
+   "🕳 العملاق TON 618 / TON 618",
+   "📏 موكب الأحجام / Parade of Sizes"
   ]
+ },
+ "directorStories": {
+  "type": "checkbox",
+  "value": true,
+  "text": "المخرج يعرض القصص الكونية أيضاً / Director includes cosmic stories"
  },
  "directorInterval": {
   "type": "slider",
@@ -130,6 +141,11 @@ window.LIVELY_PROPS = {
    "أسود نقي OLED / Pure black"
   ]
  },
+ "autoPerf": {
+  "type": "checkbox",
+  "value": true,
+  "text": "أداء تلقائي (يضبط الدقة للحفاظ على السلاسة) / Auto performance"
+ },
  "quality": {
   "type": "dropdown",
   "value": 1,
@@ -145,9 +161,9 @@ window.LIVELY_PROPS = {
   "type": "slider",
   "value": 100,
   "min": 40,
-  "max": 100,
+  "max": 200,
   "step": 5,
-  "text": "دقة الرسم % / Render resolution %"
+  "text": "دقة الرسم % (حتى 4K) / Render resolution % (up to 4K)"
  },
  "fpsLimit": {
   "type": "dropdown",
@@ -248,9 +264,12 @@ window.LIVELY_PROPS = {
   "value": true,
   "text": "إمالة الكاميرا مع الماوس / Mouse parallax"
  },
- "showGear": {
-  "type": "checkbox",
-  "value": true,
-  "text": "زر الإعدادات ⚙ على الشاشة / On-screen settings button"
+ "volume": {
+  "type": "slider",
+  "value": 70,
+  "min": 0,
+  "max": 100,
+  "step": 5,
+  "text": "مستوى الصوت % / Sound volume %"
  }
 };

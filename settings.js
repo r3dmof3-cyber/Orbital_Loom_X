@@ -21,11 +21,11 @@
   Object.keys(PROPS).forEach((k) => { PV[k] = PROPS[k].value; });
 
   const GROUPS = [
-    { ar: 'المشهد والحركة', en: 'Scene & motion', keys: ['language', 'viewMode', 'directorInterval', 'timeSpeed', 'sunVelocity', 'orbitModel', 'waveAmplitude', 'waveCount'] },
+    { ar: 'المشهد والحركة', en: 'Scene & motion', keys: ['language', 'viewMode', 'directorStories', 'directorInterval', 'timeSpeed', 'sunVelocity', 'orbitModel', 'waveAmplitude', 'waveCount'] },
     { ar: 'المسارات والكواكب', en: 'Trails & planets', keys: ['trailLength', 'trailStyle', 'trailColor', 'planetStyle', 'planetScale'] },
     { ar: 'المظهر', en: 'Look', keys: ['accent', 'background', 'bloom', 'exposure', 'cinematicFx', 'heliosphere', 'showLabels', 'showDropLines', 'showExtinctions', 'showGalaxyGrid'] },
-    { ar: 'الواجهة والتفاعل', en: 'Interface', keys: ['hudLayout', 'hudOpacity', 'showClock', 'showGear', 'audioReactive', 'mouseParallax'] },
-    { ar: 'الأداء', en: 'Performance', keys: ['quality', 'renderScale', 'fpsLimit'] },
+    { ar: 'الواجهة والتفاعل', en: 'Interface', keys: ['hudLayout', 'hudOpacity', 'showClock', 'volume', 'audioReactive', 'mouseParallax'] },
+    { ar: 'الأداء', en: 'Performance', keys: ['autoPerf', 'quality', 'renderScale', 'fpsLimit'] },
   ];
   const grouped = new Set(GROUPS.flatMap((g) => g.keys));
   const rest = Object.keys(PROPS).filter((k) => !grouped.has(k));
@@ -208,6 +208,5 @@
   if (url.has('shot')) PV.viewMode = +url.get('shot');
   if (url.has('lang')) PV.language = +url.get('lang');
   if (url.has('hud')) PV.hudLayout = +url.get('hud');
-  applyLocal('showGear', PV.showGear);
   if (url.has('settings')) open(); // ?settings=1 opens the panel on load (handy for links & screenshots)
 })();

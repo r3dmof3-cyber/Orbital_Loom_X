@@ -304,6 +304,7 @@ void main(){
     vec3 col = mix(vec3(1.0, 0.38, 0.06), vec3(1.0, 0.86, 0.58), limb);
     col *= 0.72 + 0.45 * g + 0.25 * g2;
     col *= uEmis * (1.0 + uAudio * 0.6);
+    col *= uColor / vec3(1.0, 0.8, 0.4);
     if (uStyle == 2) {
       vec2 sp = vec2(atan(p.y, p.x), asin(clamp(lat,-1.0,1.0)));
       vec2 gg = abs(fract(sp * vec2(12.0, 8.0) / PI) - 0.5);
@@ -607,7 +608,7 @@ void main(){ o = vec4(vec3(0.55, 0.75, 1.0) * vA * exp(-vSide*vSide*2.5) * uGain
 // ── spacetime fabric sheet ──
 const VS_FABRIC = H + `
 layout(location=0) in vec2 aUV;
-uniform mat4 uVP; uniform vec3 uSun, uE1, uE2, uN; uniform float uL, uDK; uniform vec4 uMass[9];
+uniform mat4 uVP; uniform vec3 uSun, uE1, uE2, uN; uniform float uL, uDK; uniform vec4 uMass[9]; uniform vec4 uWave;
 out vec2 vQ; out float vDepth; out float vR;
 float well(vec2 q){
   float d = 0.0;
@@ -617,6 +618,8 @@ float well(vec2 q){
 void main(){
   vec2 q = aUV * uL;
   float d = max(well(q) - well(vec2(uL, 0.0)), 0.0);
+  float rr = length(q);
+  d += uWave.x * sin(rr * uWave.y - uWave.z + 2.0 * atan(q.y, q.x)) * smoothstep(uWave.w, uWave.w + 9.0, rr) * (1.0 - smoothstep(uL * 0.72, uL, rr));
   vec3 w = uSun + uE1 * q.x + uE2 * q.y - uN * (d * uDK);
   vQ = q; vDepth = d; vR = length(q);
   gl_Position = uVP * vec4(w, 1.0);

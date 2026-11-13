@@ -20,6 +20,49 @@
 
 ---
 
+## 🆕 الجديد في الإصدار 2.0
+
+| | |
+|---|---|
+| 🌠 **ست قصص كونية جديدة** | النجم الطارق (النابض)، ترابيست-1، كيلونوفا، ثلاثة ثقوب سوداء، العملاق TON 618، موكب الأحجام |
+| 📱 **واجهة للهاتف** | عند فتح الموقع من الهاتف يتغير التصميم إلى وضع عمودي، مع شريط مشاهد سفلي ولمس وتقريب بإصبعين |
+| 🔊 **نظام صوت** | صوت محيطي يتغير مع كل مشهد، وطَرْق النابض بتردده الحقيقي، وصوت اندماج النجمين. كله مولَّد برمجياً بدون ملفات صوت |
+| 👁 **زر العين** | يخفي الأدوات: الواجهة كاملة ← الشرح فقط ← المشهد فقط |
+| 🎬 **تصدير صورة وفيديو** | صورة PNG حتى 4K، أو فيديو لعدة مشاهد متتالية مع الشرح والصوت، أفقي أو عمودي (Reels) أو مربع |
+| ⚡ **أداء وسرعة** | أداء تلقائي يضبط الدقة للحفاظ على السلاسة، ودعم حتى 4K، ورسم الثقب الأسود في منطقته فقط |
+| 🖥️ **نسختان** | نسخة الويب فيها كل الأدوات، ونسخة سطح المكتب خفيفة وإعداداتها من Customize في Lively |
+
+![Cosmic stories](docs/screenshots/stories.jpg)
+
+### نسخة الويب ونسخة سطح المكتب
+
+| الميزة | 🌐 الموقع المباشر | 🖥️ خلفية Lively (ZIP) |
+|---|---|---|
+| كل المشاهد والقصص الـ 14 | ✅ | ✅ |
+| المخرج السينمائي التلقائي | ✅ | ✅ |
+| الإعدادات | لوحة ⚙ على الشاشة | Customize في Lively |
+| الصوت | ✅ | — |
+| تصدير صورة وفيديو | ✅ | — |
+| زر العين وملء الشاشة | ✅ | خيار "الواجهة" في Customize |
+| واجهة الهاتف | ✅ | — |
+
+### 📱 على الهاتف
+افتح **https://r3dmof3-cyber.github.io/Orbital_Loom_X/** من متصفح الهاتف. اسحب بإصبع لتدوير الكاميرا، وقرّب بإصبعين، واختر المشهد من الشريط السفلي.
+
+![Mobile layout](docs/screenshots/mobile.jpg)
+
+### 🎬 التصدير (نسخة الويب)
+اضغط زر التصدير ⬇ في شريط الأدوات (أو حرف `E`)، ثم اختر:
+- **النوع:** صورة PNG أو فيديو.
+- **الدقة:** 1080p أو 1440p أو 4K.
+- **الشكل:** أفقي 16:9، أو عمودي 9:16 للريلز، أو مربع.
+- **المشاهد ومدة كل مشهد:** لعمل فيديو علمي من عدة مشاهد متتالية.
+- **الشرح والأسماء والصوت:** تُضاف على الفيديو نفسه.
+
+> يُسجَّل الفيديو بالزمن الحقيقي، فأبقِ الصفحة ظاهرة حتى ينتهي. الصيغة MP4 في المتصفحات التي تدعمها، وإلا WebM. دقة 4K تحتاج كرت شاشة قوياً.
+
+---
+
 ## 📥 التثبيت والتشغيل (عربي)
 
 ### الطريقة 1: ملف ZIP (موصى بها)
@@ -53,7 +96,7 @@ https://r3dmof3-cyber.github.io/Orbital_Loom_X/
 - زر **↺ الافتراضي** يرجع كل الخيارات إلى قيمها الأصلية.
 - اختصار لوحة المفاتيح: حرف **`S`** يفتح اللوحة ويغلقها، و **`Esc`** يغلقها.
 - رابط يفتح اللوحة مباشرة: https://r3dmof3-cyber.github.io/Orbital_Loom_X/?settings=1
-- لإخفاء الزر داخل Lively: من Customize ألغِ خيار **زر الإعدادات ⚙ على الشاشة**.
+- هذه اللوحة في نسخة الويب فقط. في خلفية Lively تُضبط الخيارات من **Customize**.
 
 ![Settings panel](docs/screenshots/settings-panel.jpg)
 
@@ -71,6 +114,12 @@ https://r3dmof3-cyber.github.io/Orbital_Loom_X/
 | 5 | 🫧 الغلاف الشمسي | الصدمة الانتهائية، وحد الغلاف، وموجة القوس، والرياح بين النجمية |
 | 6 | 🕸️ نسيج الزمكان | بئر جاذبية الشمس والكواكب تدور على مداراتها داخله |
 | 7 | 🎥 كاميرا حرة | تحكم كامل بالماوس |
+| 8 | ✦ النجم الطارق (النابض) | نجم نيوتروني يدور وتكنس حزمتاه الفضاء. أربعة نوابض حقيقية من 1.4 إلى 716 دورة في الثانية |
+| 9 | 🔴 ترابيست-1 | سبعة كواكب بحجم الأرض حول قزم أحمر، والمنطقة الصالحة للحياة، ومدار عطارد للمقارنة |
+| 10 | 💥 كيلونوفا | نجمان نيوترونيان يقتربان حلزونياً، وأمواج الجاذبية على نسيج الزمكان، ثم الاندماج |
+| 11 | ☯ ثلاثة ثقوب سوداء | مسألة الأجسام الثلاثة: محاكاة فوضوية حقيقية تتغير في كل مرة |
+| 12 | 🕳 العملاق TON 618 | الكاميرا تبتعد من المجموعة الشمسية حتى يظهر الثقب الأسود كاملاً بمقياس حقيقي |
+| 13 | 📏 موكب الأحجام | الأحجام الحقيقية للكواكب والشمس جنباً إلى جنب |
 
 | | |
 |---|---|
@@ -90,9 +139,13 @@ https://r3dmof3-cyber.github.io/Orbital_Loom_X/
 | `Space` | إيقاف الزمن مؤقتاً |
 | `H` / `L` | إخفاء الواجهة أو الأسماء |
 | `S` | فتح الإعدادات أو إغلاقها |
+| `[` `]` | المشهد السابق أو التالي (يشمل القصص) |
+| `V` / `M` / `E` / `F` | العين / الصوت / التصدير / ملء الشاشة (نسخة الويب) |
 | `←` `→` / `Esc` | التنقل بين الكواكب أو إلغاء التتبع |
 
 ## ⚙️ نصائح الأداء
+- **الأداء التلقائي** مفعّل افتراضياً: إذا هبطت السلاسة يخفض دقة الرسم قليلاً ثم يرفعها عند توفر القدرة.
+- **4K:** على شاشة 4K تُرسم الخلفية بدقتها الكاملة. وعلى شاشة أقل يمكنك رفع **دقة الرسم %** حتى 200 للحصول على صورة أنعم (تحتاج كرت شاشة قوياً).
 - إذا كان الجهاز ضعيفاً: من Customize قلل **دقة الرسم %** إلى 60–75، واختر الجودة **اقتصادي**، وحد **30 FPS**.
 - Lively يوقف الخلفية تلقائياً عند تشغيل لعبة أو برنامج بملء الشاشة. يمكنك ضبط ذلك من Settings ← Performance.
 - تحتاج الخلفية **WebGL2**، وهو متوفر في أي كرت شاشة حديث مع تعريفات محدثة.
@@ -112,7 +165,16 @@ https://r3dmof3-cyber.github.io/Orbital_Loom_X/
 **Browser only, without Lively:** open https://r3dmof3-cyber.github.io/Orbital_Loom_X/ in any modern browser, or open `index.html` from the extracted folder. Press **F11** for fullscreen.
 
 ### ⚙️ On-screen settings
-Click the **⚙** button under the clock to open a side panel with **every** option from Lively's Customize panel. Changes apply instantly and are saved in your browser. **↺ Reset** restores the defaults, **`S`** toggles the panel, and `?settings=1` opens it on load. Inside Lively you can hide the button from Customize.
+Click the **⚙** button under the clock to open a side panel with **every** option from Lively's Customize panel. Changes apply instantly and are saved in your browser. **↺ Reset** restores the defaults, **`S`** toggles the panel, and `?settings=1` opens it on load. The panel is part of the web build; the Lively wallpaper uses Lively's own Customize panel.
+
+### What's new in 2.0
+- **Six cosmic stories:** a pulsar with four real spin rates, TRAPPIST-1, a kilonova with gravitational waves, a chaotic three-black-hole simulation, a true-scale zoom out from the Solar System to TON 618, and a parade of true planet sizes.
+- **Phone layout:** the live site switches to a portrait design with a bottom scene bar, touch orbit and pinch zoom.
+- **Sound (web):** a procedural soundscape per scene, pulsar ticks at their real rate, and the merger chirp. No audio files.
+- **Eye button (web):** full interface → captions only → scene only.
+- **Export (web):** PNG up to 4K, or a multi-scene video with burned-in captions, labels and sound, in landscape, 9:16 or square.
+- **Speed:** auto performance (dynamic resolution), rendering up to 4K, and the black hole is shaded only where it is on screen.
+- **Two builds:** the website has every tool; the Lively ZIP is lean and is configured from Lively's Customize panel.
 
 ### Features
 - **Analytic helical trails.** Each planet's path, including the Sun's galactic orbit, its vertical oscillation and the 60° tilt of the ecliptic, is evaluated on the GPU every frame. The trails stay perfectly smooth at any length.
@@ -129,7 +191,7 @@ Click the **⚙** button under the clock to open a side panel with **every** opt
 - 100% offline, with no external libraries.
 
 ### Controls
-Drag to orbit, scroll to zoom, click a planet to follow it, and double-click to reset. Keys: `0–7` shots, `Space` pause, `H` HUD, `L` labels, `S` settings, `←/→` cycle planets, `Esc` stop following.
+Drag to orbit, scroll to zoom, click a planet to follow it, and double-click to reset. Keys: `0–7` shots, `Space` pause, `H` HUD, `L` labels, `S` settings, `[`/`]` previous/next scene, and on the web `V` eye, `M` sound, `E` export, `F` fullscreen, `←/→` cycle planets, `Esc` stop following.
 
 ---
 
@@ -139,7 +201,9 @@ index.html              page layout & HUD
 style.css               glass HUD styling
 shaders.js              all GLSL ES 3.00 shaders
 script.js               engine: simulation, camera director, renderer, Lively bridge
-settings.js             on-screen ⚙ settings panel (works in Lively and in any browser)
+stories.js              the six deep-sky stories
+settings.js             on-screen ⚙ settings panel (web build only)
+web.js                  toolbar, eye, sound, export, fullscreen (web build only)
 props.js                generated from LivelyProperties.json by tools/build.py
 tools/build.py          regenerates props.js and the release ZIP
 LivelyInfo.json         Lively metadata
@@ -148,7 +212,7 @@ release/                ready-to-import ZIP
 docs/screenshots/       images for this README
 ```
 
-To rebuild after editing, run `python tools/build.py`. It regenerates `props.js` from `LivelyProperties.json` and repacks `release/Orbital_Loom_X_Galactic_Voyage.zip`.
+To rebuild after editing, run `python tools/build.py`. It regenerates `props.js` from `LivelyProperties.json` and packs the desktop ZIP, leaving out the scripts between the `web-only` markers in `index.html`.
 
 ## 📜 License
 [MIT](LICENSE). Free to use, share and modify; please keep the credit.
