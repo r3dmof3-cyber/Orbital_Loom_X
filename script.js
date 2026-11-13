@@ -21,7 +21,7 @@ const S = {
   trailStyle: 0, trailColor: 0, orbitModel: 0, planetStyle: 0, planetScale: 1, waveAmplitude: 40, waveCount: 4,
   background: 0, quality: 1, renderScale: 1, fpsLimit: 1, bloom: 1, exposure: 1, cinematicFx: true,
   showLabels: true, showDropLines: true, showExtinctions: true, showGalaxyGrid: true, heliosphere: 0,
-  hudLayout: 0, hudOpacity: 0.9, showClock: true, accent: '#F5B94A', audioReactive: true, mouseParallax: true, directorStories: true, autoPerf: true,
+  hudLayout: 0, hudOpacity: 0.9, showClock: true, accent: '#F5B94A', audioReactive: true, mouseParallax: true, directorStories: true, autoPerf: true, resolution: 0,
 };
 
 /* ───────────────────────── world constants ───────────────────────── */
@@ -390,7 +390,10 @@ const nebula = (() => {
 
 let W = 1, Hh = 1, pxScale = 1, scene = null, bloom = [];
 const MAX_PIXELS = 3840 * 2160;
-let drs = 1, fixedSize = null;   // dynamic resolution scale (auto performance) and export override
+/* rough GPU class from the renderer string: 0 integrated / mobile, 1 mid, 2 discrete high-end */
+const GPU_NAME = (() => { try { const e = gl.getExtension('WEBGL_debug_renderer_info'); return e ? String(gl.getParameter(e.UNMASKED_RENDERER_WEBGL)) : ''; } catch (e) { return ''; } })();
+const GPU_TIER = /RTX|GTX 1[06-9]|GTX [2-9]|RX [5-9]\d{3}|Radeon Pro|Arc\(TM\) A|Apple M\d/i.test(GPU_NAME) ? 2 : /Intel.*(HD|UHD)|Mali|Adreno|PowerVR|SwiftShader|llvmpipe|Basic Render/i.test(GPU_NAME) ? 0 : 1;
+let drs = GPU_TIER === 0 ? 0.7 : 1, fixedSize = null;   // dynamic resolution scale (auto performance) and export override
 function resize() {
   const iw = window.innerWidth, ih = window.innerHeight;
   const portrait = iw < ih * 0.8;
@@ -399,6 +402,10 @@ function resize() {
   const dpr = Math.min(window.devicePixelRatio || 1, 3);
   let w = Math.max(64, Math.round(iw * dpr * S.renderScale * drs));
   let h = Math.max(64, Math.round(ih * dpr * S.renderScale * drs));
+  if (S.resolution > 0) {   // explicit output resolution, independent of the window (4K on a 1080p screen supersamples)
+    const t = [0, 720, 1080, 1440, 2160][S.resolution];
+    if (iw >= ih) { h = t; w = Math.round(t * iw / ih); } else { w = t; h = Math.round(t * ih / iw); }
+  }
   const cap = Math.sqrt(MAX_PIXELS / (w * h));           // never exceed a 4K frame
   if (cap < 1) { w = Math.round(w * cap); h = Math.round(h * cap); }
   if (fixedSize) { w = fixedSize[0]; h = fixedSize[1]; }
@@ -653,11 +660,17 @@ function drawBody(center, R, type, extra) {
   if (d <= R * 1.02) return 0;
   const pxR = R * cam.focal / d;
   if (pxR < 0.35) return pxR;
-  const q = R * d / Math.sqrt(Math.max(d * d - R * R, 1e-6)) * 1.06 + 2.5 * d / cam.focal;
   const cv = mulPoint(cam.view, center);
+  let q = R * d / Math.sqrt(Math.max(d * d - R * R, 1e-6)) * 1.06 + 2.5 * d / cam.focal;
+  {  // off-axis a sphere projects to an ellipse wider than R: size the quad from the true silhouette, or its sides get cut
+    const zc = -cv[2], off = Math.hypot(cv[0], cv[1]);
+    if (zc > 1e-4) { const th = Math.atan2(off, zc), al = Math.asin(Math.min(R / d, 0.999)); q = Math.max(q, zc * (Math.tan(Math.min(th + al, 1.5)) - Math.tan(th)) * 1.08 + 2.5 * d / cam.focal); }
+    else q = Math.max(q, R * 40);
+  }
   use(P.body, Object.assign({
     uView: cam.view, uProj: cam.proj, uCenter: center, uQuad: q, uCenterV: cv, uR: R, uFocal: cam.focal,
     uTime: sim.realTime, uType: type, uStyle: S.planetStyle, uAudio: sim.audio,
+    uLod: clamp((pxR - 22) / 200, 0, 1) * [0.5, 1, 1, 1][S.quality],
   }, extra));
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   return pxR;
@@ -1067,7 +1080,7 @@ function updateHud(dt) {
   set('dist', ly > 10000 ? `${fmt(ly / 1000, 1)} <small>${l.kly}</small>` : `${fmt(ly, 0)} <small>${l.ly}</small>`);
   set('lon', `${fmt(((sim.thetaU - THETA0) * 180 / Math.PI) % 360, 2)}°`);
   set('moved', `<span class="a">${fmt(230 * sim.realTime, 0)}</span> <small>km</small>`);
-  $('teleFoot').textContent = `${Math.round(fps)} FPS · ${W}×${Hh}${drs < 0.99 ? ' (auto ' + Math.round(drs * 100) + '%)' : ''} · ${HAS_FLOAT ? 'HDR16F' : 'LDR'} · ${(galaxy.nAdd / 1000).toFixed(0)}k ★${sim.paused ? ' · ⏸' : ''}`;
+  $('teleFoot').textContent = `${Math.round(fps)} FPS · ${W}×${Hh}${drs < 0.99 ? ' (auto ' + Math.round(drs * 100) + '%)' : ''} · ${HAS_FLOAT ? 'HDR16F' : 'LDR'} · GPU${GPU_TIER} · ${(galaxy.nAdd / 1000).toFixed(0)}k ★${sim.paused ? ' · ⏸' : ''}`;
   drawWave(F);
   // clock
   const now = new Date();
@@ -1198,6 +1211,7 @@ window.livelyPropertyListener = function (name, val) {
     case 'renderScale': S.renderScale = clamp(n / 100, 0.3, 2); resize(); break;
     case 'directorStories': S.directorStories = bool(val); DIRECTOR_ORDER = S.directorStories ? DIRECTOR_ALL : DIRECTOR_SOLAR; directorIdx = 0; if (S.viewMode === 0) setShot(DIRECTOR_ORDER[0]); break;
     case 'autoPerf': S.autoPerf = bool(val); if (!S.autoPerf) { drs = 1; resize(); } break;
+    case 'resolution': S.resolution = clamp(n | 0, 0, 4); drs = S.resolution ? 1 : GPU_TIER === 0 ? 0.7 : 1; resize(); break;
     case 'fpsLimit': S.fpsLimit = clamp(n | 0, 0, 2); break;
     case 'bloom': S.bloom = clamp(n / 100, 0, 3); break;
     case 'exposure': S.exposure = clamp(n / 100, 0.2, 3); break;
@@ -1247,7 +1261,7 @@ function frame(now) {
 /* dynamic resolution: drop the render scale when frames run long, creep back up when there is headroom */
 let apT = 0, apN = 0, apSlow = 0, apCool = 0, apCeil = 1;
 function autoPerf(dt) {
-  if (!S.autoPerf || fixedSize) return;
+  if (!S.autoPerf || fixedSize || S.resolution > 0) return;
   apT += dt; apN++;
   if (apT < 1.5) return;
   const avg = apT / apN, target = 1 / ([30, 60, 60][S.fpsLimit] || 60);

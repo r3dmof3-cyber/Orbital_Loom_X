@@ -146,6 +146,7 @@
   const audio = { tick: 0, chirp: 0, boom: 0 };
   let facts = [];
   const st = { id: '', t: 0 };
+  let ST0 = +(new URLSearchParams(location.search).get('st') || 0);   // ?st=seconds starts a story part-way in
 
   /* ═════════ pulsar ═════════ */
   const PULSARS = [
@@ -310,7 +311,7 @@
     let u = f - i0; u = clamp((u - 0.45) / 0.55, 0, 1); u = u * u * (3 - 2 * u);
     const fx = lerp(SZX[i0], SZX[i1], u), fr = Math.exp(lerp(Math.log(SZ[i0][1]), Math.log(SZ[i1][1]), u));
     cam.storyDist = fr * 4.6;
-    const sunV = mulPoint(cam.view, [-4e4, 2e4, 5e4]), axis = v3.norm([0.25, 1, 0.12]), a1 = v3.norm(v3.cross(axis, Z)), a2 = v3.cross(axis, a1);
+    const sunV = mulPoint(cam.view, [-6e4, 2.2e4, 2.2e4]), axis = v3.norm([0.25, 1, 0.12]), a1 = v3.norm(v3.cross(axis, Z)), a2 = v3.cross(axis, a1);
     const basis = basisMat({ a1, a2, axis });
     stateBodies();
     const jobs = [];
@@ -318,14 +319,14 @@
       const pos = [SZX[i] - fx + (type === 8 ? (1 - clamp((f - 6.4) / 1.3, 0, 1)) ** 2 * 900 : 0), 0, 0];
       if (Math.abs(pos[0]) - R > cam.dist * 3.2) return;
       const pl = E.PLANETS[type];
-      drawBody(pos, R, type, { uBasis: basis, uSpin: sim.realTime * 0.12, uEmis: type === 8 ? 5.5 : 1, uColor: type === 8 ? [1, 0.8, 0.4] : pl.col, uSunV: sunV, uRingN: mulDir(cam.view, axis) });
+      drawBody(pos, R, type, { uBasis: basis, uSpin: sim.realTime * 0.12, uEmis: type === 8 ? 0.85 : 1, uColor: type === 8 ? [1, 0.8, 0.4] : pl.col, uSunV: sunV, uRingN: mulDir(cam.view, axis) });
       if (pl && pl.ring) jobs.push([pos, R, pl, type]);
       const near = Math.abs(i - f) < 1.6;
       if (near) label([pos[0], R * 1.12, 0], type === 8 ? tx('الشمس', 'Sun') : tx(pl.ar, pl.en), `${R >= 10 ? R.toFixed(0) : R.toFixed(2)} × ${tx('الأرض', 'Earth')}`, type === 8 ? '#ffd38a' : `rgb(${pl.col.map((x) => Math.round(x * 255)).join(',')})`, true);
     });
     gl.depthMask(false);
     jobs.forEach(([pos, R, pl, type]) => {
-      use(P.ring, { uVP: cam.vp, uCenter: pos, uA1: a1, uA2: a2, uR: R, uOut: pl.ring, uSun: [-4e4, 2e4, 5e4], uCam: cam.eye, uN: axis, uType: type, uStyle: S.planetStyle, uTint: pl.col });
+      use(P.ring, { uVP: cam.vp, uCenter: pos, uA1: a1, uA2: a2, uR: R, uOut: pl.ring, uSun: [-6e4, 2.2e4, 2.2e4], uCam: cam.eye, uN: axis, uType: type, uStyle: S.planetStyle, uTint: pl.col });
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     });
     audio.tick = 0; audio.chirp = 0;
@@ -340,9 +341,10 @@
   window.OLX_STORIES = {
     audio,
     draw(id, c) {
-      if (st.id !== id) { st.id = id; st.t = 0; audio.tick = 0; audio.chirp = 0; }
+      if (st.id !== id) { st.id = id; st.t = ST0; st.snap = ST0 > 0 ? 3 : 0; ST0 = 0; audio.tick = 0; audio.chirp = 0; }
       used = 0;
       SCENES[id](c);
+      if (st.snap) { st.snap--; cam.logDist.snap(Math.log(E.SHOTS[E.shot()].dist * (cam.storyDist || 1))); }
       st.t += c.dt;
       endLabels();
       gl.depthMask(true); gl.disable(gl.DEPTH_TEST); gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE);

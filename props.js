@@ -157,13 +157,25 @@ window.LIVELY_PROPS = {
    "أقصى / Extreme (400k)"
   ]
  },
+ "resolution": {
+  "type": "dropdown",
+  "value": 0,
+  "text": "دقة العرض / Output resolution",
+  "items": [
+   "تلقائي حسب الشاشة والكرت / Auto (screen + GPU)",
+   "720p (أخف / lightest)",
+   "1080p Full HD",
+   "1440p (2K)",
+   "2160p (4K Ultra HD)"
+  ]
+ },
  "renderScale": {
   "type": "slider",
   "value": 100,
   "min": 40,
   "max": 200,
   "step": 5,
-  "text": "دقة الرسم % (حتى 4K) / Render resolution % (up to 4K)"
+  "text": "دقة الرسم % في الوضع التلقائي / Render scale % (Auto mode)"
  },
  "fpsLimit": {
   "type": "dropdown",

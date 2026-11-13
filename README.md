@@ -34,6 +34,13 @@
 
 ![Cosmic stories](docs/screenshots/stories.jpg)
 
+### 🪐 كواكب بتفاصيل عالية (2.2)
+عند الاقتراب من أي كوكب تزيد تفاصيل سطحه تلقائياً: فوهات عطارد والمريخ بتضاريس وظلال حقيقية، وقارات الأرض وجبالها وغيومها وأضواء مدنها، وأحزمة المشتري وبقعته الحمراء، وحبيبات سطح الشمس وبقعها. كل ذلك مرسوم برمجياً بدون صور، فيبقى حاداً بأي دقة حتى 4K.
+
+خيار **دقة العرض** الجديد: تلقائي (حسب الشاشة وكرت الشاشة) أو 720p أو 1080p أو 1440p أو 4K.
+
+![Planet detail](docs/screenshots/planets-detail.jpg)
+
 ### نسخة الويب ونسخة سطح المكتب
 
 | الميزة | 🌐 الموقع المباشر | 🖥️ خلفية Lively (ZIP) |
@@ -176,6 +183,11 @@ Click the **⚙** button under the clock to open a side panel with **every** opt
 - **Export (web):** PNG up to 4K, or a multi-scene video with burned-in captions, labels and sound, in landscape, 9:16 or square.
 - **Speed:** auto performance (dynamic resolution), rendering up to 4K, and the black hole is shaded only where it is on screen.
 - **Two builds:** the website has every tool; the Lively ZIP keeps the eye and sound and is configured from Lively's Customize panel.
+
+### 2.2: detailed planets and resolution presets
+- Surfaces gain detail as the camera gets close: cratered relief on Mercury and Mars, Earth's mountains, coasts, clouds and city lights, Jupiter's bands and swirling Great Red Spot, solar granulation and sunspots. All procedural, so it stays sharp at any resolution.
+- **Output resolution** option: Auto (from screen and GPU class), 720p, 1080p, 1440p or 4K.
+- Fixed planets being cut off at the sides when close to the screen edge.
 
 ### Features
 - **Analytic helical trails.** Each planet's path, including the Sun's galactic orbit, its vertical oscillation and the 60° tilt of the ecliptic, is evaluated on the GPU every frame. The trails stay perfectly smooth at any length.

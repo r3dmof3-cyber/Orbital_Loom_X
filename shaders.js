@@ -208,65 +208,112 @@ float ringDensity(float r){
   return d * 0.35;
 }
 
+uniform float uLod;
+float fbmH(vec3 p){ float a = 0.5, s = 0.0; for (int i = 0; i < 8; i++){ s += a*vnoise(p); p = p*2.03 + vec3(1.7, 9.2, 3.1); a *= 0.5; } return s; }
+vec3 hash33(vec3 p){ p = fract(p * vec3(0.1031, 0.1030, 0.0973)); p += dot(p, p.yxz + 33.33); return fract((p.xxy + p.yxx) * p.zyx); }
+// crater field: bowl (negative) with a raised rim (positive)
+float craters(vec3 p, float sc){
+  p *= sc; vec3 i = floor(p), f = fract(p); float h = 0.0;
+  for (int x = -1; x <= 1; x++) for (int y = -1; y <= 1; y++) for (int z = -1; z <= 1; z++){
+    vec3 g = vec3(float(x), float(y), float(z)); vec3 o3 = hash33(i + g);
+    if (o3.y < 0.42) continue;
+    float rad = 0.16 + 0.30 * o3.x * o3.z;
+    float d = length(g + o3 - f) / rad;
+    h += (smoothstep(0.72, 1.0, d) * (1.0 - smoothstep(1.0, 1.4, d)) * 0.55 - (1.0 - smoothstep(0.0, 0.92, d)) * 0.8) * rad;
+  }
+  return h;
+}
+float heightOf(vec3 p){
+  if (uType == 0) return (fbm(p * 5.0) - 0.5) * 0.45 + craters(p, 5.0) * 1.3 + craters(p, 13.0) * 0.9 + (fbmH(p * 26.0) - 0.5) * 0.10;
+  return (fbm(p * 3.0 + 1.0) - 0.5) * 0.9 + craters(p, 9.0) * 0.55 + (fbmH(p * 22.0) - 0.5) * 0.16;
+}
+
 vec3 surface(vec3 p, float lat, out float spec, out vec3 night, out vec3 atm, out float atmK){
   spec = 0.0; night = vec3(0.0); atm = vec3(0.0); atmK = 0.0;
+  float fine = fbmH(p * 38.0) - 0.5;                       // sub-pixel when far away, crisp in close-ups
   if (uType == 0) {
     float n = fbm(p * 4.0); float cr = fbm(p * 14.0);
-    vec3 c = mix(vec3(0.36,0.34,0.33), vec3(0.62,0.59,0.55), n);
-    c *= 0.75 + 0.5 * smoothstep(0.35, 0.75, cr);
+    vec3 c = mix(vec3(0.30,0.29,0.28), vec3(0.60,0.57,0.53), n);
+    c *= 0.78 + 0.44 * smoothstep(0.35, 0.75, cr);
+    float ch = craters(p, 5.0) + craters(p, 13.0) * 0.6;
+    c *= 1.0 + ch * 1.1;
+    c += vec3(0.16) * smoothstep(0.80, 0.95, fbm(p * 2.3 + 7.0)) * (0.6 + 0.8 * fbm(p * 30.0));   // bright ray systems
+    c *= 1.0 + fine * 0.35 * uLod;
     return c;
   } else if (uType == 1) {
-    vec3 q = p * 2.0; q.x += lat * 1.5;
-    float n = fbm(q + vec3(uTime * 0.02, 0.0, 0.0));
-    atm = vec3(1.0, 0.8, 0.5); atmK = 0.9;
-    return mix(vec3(0.85,0.62,0.32), vec3(1.0,0.93,0.75), n);
+    vec3 w = p + 0.30 * vec3(fbm(p * 2.2 + uTime * 0.012), fbm(p * 2.2 + 5.0), fbm(p * 2.2 + 9.0)) - 0.15;
+    float n = fbmH(vec3(w.x * 1.6, w.y * 1.6, w.z * 5.5) + vec3(uTime * 0.02, 0.0, 0.0));
+    float n2 = fbm(vec3(w.xy * 3.0, w.z * 14.0));
+    atm = vec3(1.0, 0.82, 0.55); atmK = 0.8;
+    vec3 c = mix(vec3(0.66,0.47,0.24), vec3(0.90,0.80,0.60), smoothstep(0.25, 0.75, n));
+    c *= 0.86 + 0.26 * n2;
+    return c;
   } else if (uType == 2) {
-    float h = fbm(p * 1.9 + 3.0) + 0.25 * fbm(p * 7.0);
-    float land = smoothstep(0.66, 0.69, h);
+    float h = fbm(p * 1.9 + 3.0) + 0.25 * fbm(p * 7.0) + 0.05 * fbm(p * 19.0) + 0.02 * fine * uLod;
+    float land = smoothstep(0.665, 0.685, h);
     float ice = smoothstep(0.80, 0.86, abs(lat) + 0.05 * fbm(p*6.0));
-    vec3 oc = mix(vec3(0.01,0.06,0.20), vec3(0.03,0.16,0.38), smoothstep(0.4, 0.66, h));
-    float veg = fbm(p * 5.0 + 9.0);
-    vec3 lc = mix(vec3(0.10,0.24,0.07), vec3(0.50,0.40,0.24), smoothstep(0.4, 0.62, veg) + smoothstep(0.55,0.2,abs(lat))*0.3);
+    vec3 oc = mix(vec3(0.005,0.035,0.14), vec3(0.02,0.17,0.36), smoothstep(0.4, 0.665, h));
+    oc += vec3(0.0, 0.10, 0.10) * smoothstep(0.63, 0.665, h);                 // shallow shelves
+    float veg = fbm(p * 5.0 + 9.0), dry = smoothstep(0.42, 0.14, abs(abs(lat) - 0.36)) * smoothstep(0.35, 0.6, fbm(p * 3.0 + 4.0));
+    vec3 lc = mix(vec3(0.07,0.20,0.05), vec3(0.24,0.30,0.10), smoothstep(0.35, 0.65, veg));
+    lc = mix(lc, vec3(0.62,0.48,0.28), dry);
+    lc = mix(lc, vec3(0.42,0.36,0.30), smoothstep(0.76, 0.86, h));             // mountains
+    lc = mix(lc, vec3(0.95), smoothstep(0.86, 0.92, h));                       // snow caps
+    lc *= 0.85 + 0.5 * fbm(p * 26.0);
     vec3 c = mix(oc, lc, land);
     c = mix(c, vec3(0.92,0.95,1.0), ice);
-    float cl = smoothstep(0.50, 0.78, fbm(p * 3.2 + vec3(uTime * 0.012, 0.0, uTime*0.006)));
-    c = mix(c, vec3(1.0), cl * 0.9);
+    vec3 cp = p + 0.06 * vec3(fbm(p * 5.0 + 2.0), fbm(p * 5.0 + 6.0), 0.0);
+    float cl = smoothstep(0.50, 0.76, fbm(cp * 3.2 + vec3(uTime * 0.012, 0.0, uTime*0.006)) + 0.10 * fine);
+    cl *= 0.75 + 0.5 * fbm(cp * 14.0 + uTime * 0.01);
+    c = mix(c, vec3(1.0), clamp(cl, 0.0, 1.0) * 0.92);
     spec = (1.0 - land) * (1.0 - cl) * (1.0 - ice);
-    night = vec3(1.0, 0.62, 0.25) * land * (1.0 - cl) * (1.0 - ice) * smoothstep(0.62, 0.78, vnoise(p * 55.0)) * 1.4;
-    atm = vec3(0.35, 0.6, 1.0); atmK = 1.3;
+    night = vec3(1.0, 0.62, 0.25) * land * (1.0 - cl) * (1.0 - ice) * smoothstep(0.60, 0.78, vnoise(p * 55.0) * (0.6 + 0.8 * fbm(p * 9.0))) * 1.6;
+    atm = vec3(0.30, 0.58, 1.0); atmK = 1.5;
     return c;
   } else if (uType == 3) {
     float n = fbm(p * 3.0 + 1.0); float m = fbm(p * 9.0);
-    vec3 c = mix(vec3(0.55,0.20,0.08), vec3(0.85,0.45,0.22), n);
-    c *= 0.75 + 0.35 * m;
-    c = mix(c, vec3(0.95,0.92,0.9), smoothstep(0.88, 0.92, abs(lat)));
-    atm = vec3(1.0, 0.55, 0.35); atmK = 0.35;
+    vec3 c = mix(vec3(0.42,0.15,0.06), vec3(0.82,0.42,0.20), n);
+    c = mix(c, vec3(0.26,0.13,0.09), smoothstep(0.55, 0.72, fbm(p * 2.1 + 12.0)) * 0.65);   // dark basalt plains
+    c *= 0.78 + 0.34 * m;
+    c *= 1.0 + craters(p, 9.0) * 0.9;
+    c *= 1.0 + fine * 0.4 * uLod;
+    c = mix(c, vec3(0.95,0.92,0.9), smoothstep(0.86, 0.91, abs(lat) + 0.05 * fbm(p * 8.0)));
+    atm = vec3(1.0, 0.55, 0.35); atmK = 0.4;
     return c;
   } else if (uType == 4 || uType == 5) {
-    float turb = fbm(p * vec3(3.0, 1.0, 3.0) * 2.0 + vec3(uTime * 0.01, 0.0, 0.0));
-    float bands = sin(lat * (uType == 4 ? 21.0 : 15.0) + turb * 3.2);
-    vec3 a = uType == 4 ? vec3(0.93,0.86,0.74) : vec3(0.95,0.87,0.64);
-    vec3 b = uType == 4 ? vec3(0.62,0.40,0.24) : vec3(0.80,0.66,0.42);
-    vec3 c = mix(b, a, 0.5 + 0.5 * bands);
-    c *= 0.85 + 0.3 * fbm(p * 6.0);
+    vec3 w = p + 0.05 * vec3(fbm(p * 6.0 + uTime * 0.01), fbm(p * 6.0 + 3.0), 0.0);
+    float turb = fbm(w * vec3(3.0, 3.0, 1.0) * 2.0 + vec3(uTime * 0.01, 0.0, 0.0));
+    float la = w.z + 0.035 * (fbmH(w * vec3(9.0, 9.0, 2.0)) - 0.5);
+    float bands = sin(la * (uType == 4 ? 21.0 : 15.0) + turb * 3.2);
+    vec3 a = uType == 4 ? vec3(0.90,0.83,0.70) : vec3(0.92,0.84,0.62);
+    vec3 b = uType == 4 ? vec3(0.56,0.34,0.20) : vec3(0.76,0.62,0.40);
+    vec3 c = mix(b, a, smoothstep(-0.7, 0.7, bands));
+    c = mix(c, uType == 4 ? vec3(0.80,0.62,0.48) : vec3(0.88,0.78,0.56), 0.35 * sin(la * 47.0 + turb * 9.0) + 0.0);
+    c *= 0.84 + 0.32 * fbmH(w * vec3(7.0, 7.0, 26.0) + vec3(uTime * 0.015, 0.0, 0.0));
+    c *= 1.0 + 0.07 * sin(la * 150.0 + turb * 16.0) * uLod;
     if (uType == 4) {
       vec2 sp = vec2(atan(p.y, p.x), lat);
       vec2 dd = vec2(mod(sp.x - 1.0 + PI, TAU) - PI, (sp.y + 0.36) * 2.4);
-      float grs = exp(-dot(dd, dd) * 28.0);
-      c = mix(c, vec3(0.78,0.32,0.18), grs * 0.9);
+      float r2 = dot(dd, dd), grs = exp(-r2 * 28.0);
+      float swirl = 0.5 + 0.5 * sin(atan(dd.y, dd.x) * 2.0 + sqrt(r2) * 46.0 - uTime * 0.2);
+      c = mix(c, mix(vec3(0.72,0.28,0.15), vec3(0.88,0.48,0.30), swirl), grs * 0.92);
+      c = mix(c, vec3(0.95,0.90,0.80), exp(-pow((sqrt(r2) - 0.27) * 22.0, 2.0)) * 0.35);
     }
     atm = c; atmK = 0.4;
     return c;
   } else if (uType == 6) {
     float bands = sin(lat * 10.0 + fbm(p*3.0) * 1.5);
     atm = vec3(0.6, 0.95, 1.0); atmK = 0.8;
-    return mix(vec3(0.55,0.84,0.88), vec3(0.68,0.92,0.95), 0.5 + 0.5 * bands);
+    vec3 c = mix(vec3(0.50,0.80,0.85), vec3(0.66,0.90,0.94), 0.5 + 0.5 * bands);
+    c *= 0.94 + 0.12 * fbmH(p * vec3(4.0, 4.0, 18.0));
+    return c;
   } else {
     float bands = sin(lat * 13.0 + fbm(p * 3.0 + uTime*0.01) * 2.5);
-    vec3 c = mix(vec3(0.12,0.24,0.70), vec3(0.28,0.45,0.95), 0.5 + 0.5 * bands);
+    vec3 c = mix(vec3(0.10,0.21,0.66), vec3(0.24,0.42,0.92), 0.5 + 0.5 * bands);
+    c *= 0.88 + 0.24 * fbmH(p * vec3(5.0, 5.0, 20.0));
     vec2 dd = vec2(mod(atan(p.y, p.x) + 2.0 + PI, TAU) - PI, (lat + 0.3) * 3.0);
     c = mix(c, vec3(0.05,0.1,0.35), exp(-dot(dd,dd) * 30.0) * 0.8);
-    c = mix(c, vec3(0.9,0.95,1.0), smoothstep(0.72, 0.85, fbm(p * vec3(6.0, 2.0, 6.0) * 1.5)) * 0.6);
+    c = mix(c, vec3(0.9,0.95,1.0), smoothstep(0.70, 0.84, fbmH(p * vec3(6.0, 6.0, 2.0) * 1.5 + vec3(uTime * 0.01, 0.0, 0.0))) * 0.6);
     atm = vec3(0.35, 0.55, 1.0); atmK = 0.9;
     return c;
   }
@@ -303,6 +350,9 @@ void main(){
     float limb = pow(mu, 0.45);
     vec3 col = mix(vec3(1.0, 0.38, 0.06), vec3(1.0, 0.86, 0.58), limb);
     col *= 0.72 + 0.45 * g + 0.25 * g2;
+    col *= 1.0 + (fbmH(p * 52.0 + vec3(0.0, uTime * 0.05, 0.0)) - 0.5) * 0.55 * uLod;
+    float spot = smoothstep(0.70, 0.78, fbm(p * 3.6 + 2.0)) * (1.0 - smoothstep(0.35, 0.75, abs(lat)));
+    col *= 1.0 - 0.72 * spot;
     col *= uEmis * (1.0 + uAudio * 0.6);
     col *= uColor / vec3(1.0, 0.8, 0.4);
     if (uStyle == 2) {
@@ -316,8 +366,17 @@ void main(){
   }
 
   vec3 L = normalize(uSunV - hit);
+  vec3 Nb = N;
+  if (uStyle == 0 && uLod > 0.02 && (uType == 0 || uType == 3)) {
+    float e = 0.004, h0 = heightOf(p);
+    vec3 g = vec3(heightOf(p + vec3(e, 0.0, 0.0)) - h0, heightOf(p + vec3(0.0, e, 0.0)) - h0, heightOf(p + vec3(0.0, 0.0, e)) - h0) / e;
+    g -= p * dot(g, p);
+    vec3 pb = normalize(p - g * 0.055 * uLod);
+    vec3 lb = vec3(cs * pb.x + sn * pb.y, -sn * pb.x + cs * pb.y, pb.z);
+    Nb = normalize(mat3(uView) * (uBasis * lb));
+  }
   float ndl = dot(N, L);
-  float diff = clamp(ndl * 1.05 + 0.04, 0.0, 1.0);
+  float diff = clamp(dot(Nb, L) * 1.05 + 0.04, 0.0, 1.0) * smoothstep(-0.12, 0.10, ndl);
   float rim = pow(1.0 - mu, 3.0);
   float shadow = 1.0;
   if (uType == 5) {
@@ -332,12 +391,12 @@ void main(){
   if (uStyle == 0) {
     float spec; vec3 night, atm; float atmK;
     vec3 alb = surface(p, lat, spec, night, atm, atmK);
-    col = alb * diff * shadow * 1.45 + alb * 0.07;
-    col += alb * pow(1.0 - mu, 2.0) * 0.25;
+    col = alb * diff * shadow * 1.28 + alb * 0.05;
+    col += alb * pow(1.0 - mu, 2.0) * 0.18 * clamp(ndl + 0.5, 0.0, 1.0);
     vec3 H2 = normalize(L + V);
-    col += vec3(1.0, 0.95, 0.85) * pow(max(dot(N, H2), 0.0), 60.0) * spec * 0.9 * step(0.0, ndl);
+    col += vec3(1.0, 0.95, 0.85) * (pow(max(dot(N, H2), 0.0), 90.0) * 1.4 + pow(max(dot(N, H2), 0.0), 12.0) * 0.12) * spec * step(0.0, ndl);
     col += night * smoothstep(0.1, -0.15, ndl);
-    col += atm * atmK * rim * clamp(ndl + 0.45, 0.0, 1.0) * 1.3;
+    col += atm * atmK * (rim * 1.3 + pow(1.0 - mu, 1.4) * 0.10) * clamp(ndl + 0.45, 0.0, 1.0);
   } else if (uStyle == 1) {
     col = uColor * (0.18 + diff * 0.7) + uColor * pow(rim + 0.05, 1.3) * 3.2;
     col += vec3(1.0) * pow(max(ndl,0.0), 12.0) * 0.4;
