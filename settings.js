@@ -24,7 +24,7 @@
     { ar: 'المشهد والحركة', en: 'Scene & motion', keys: ['language', 'viewMode', 'directorStories', 'directorInterval', 'timeSpeed', 'sunVelocity', 'orbitModel', 'waveAmplitude', 'waveCount'] },
     { ar: 'المسارات والكواكب', en: 'Trails & planets', keys: ['trailLength', 'trailStyle', 'trailColor', 'planetStyle', 'planetScale'] },
     { ar: 'المظهر', en: 'Look', keys: ['accent', 'background', 'bloom', 'exposure', 'cinematicFx', 'heliosphere', 'showLabels', 'showDropLines', 'showExtinctions', 'showGalaxyGrid'] },
-    { ar: 'الواجهة والتفاعل', en: 'Interface', keys: ['hudLayout', 'hudOpacity', 'showClock', 'volume', 'audioReactive', 'mouseParallax'] },
+    { ar: 'الواجهة والتفاعل', en: 'Interface', keys: ['hudLayout', 'hudOpacity', 'showClock', 'showTools', 'sound', 'volume', 'audioReactive', 'mouseParallax'] },
     { ar: 'الأداء', en: 'Performance', keys: ['autoPerf', 'quality', 'renderScale', 'fpsLimit'] },
   ];
   const grouped = new Set(GROUPS.flatMap((g) => g.keys));

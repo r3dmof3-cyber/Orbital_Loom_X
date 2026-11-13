@@ -1,4 +1,5 @@
-/* Orbital Loom X — web-only extras (not shipped in the desktop wallpaper ZIP)
+/* Orbital Loom X — on-screen tools. The eye and sound also ship in the desktop wallpaper;
+ * export, fullscreen and the settings panel are web-only (window.OLX_DESKTOP hides them).
  * © 2026 Yousif Anwar Alkmali (يوسف أنور الكمالي) — MIT License
  *
  * Toolbar · clean-view eye · procedural sound · PNG / video export · fullscreen.
@@ -11,6 +12,7 @@
   const mk = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html) e.innerHTML = html; return e; };
   const toast = (msg) => { const t = $('toast'); if (!t) return; t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 1900); };
   const shotId = () => E.SHOTS[E.shot()].id;
+  const DESK = !!window.OLX_DESKTOP;
 
   /* ───────── toolbar ───────── */
   const tools = mk('div'); tools.id = 'tools'; document.body.appendChild(tools);
@@ -123,13 +125,17 @@
   // the settings panel's volume slider arrives through the property listener
   const prevListener = window.livelyPropertyListener;
   window.livelyPropertyListener = function (name, val) {
+    const on = val === true || val === 'true' || val === 'True' || val === 1 || val === '1';
     if (name === 'volume') { A.vol = Math.max(0, Math.min(1, Number(val) / 100)); return; }
+    if (name === 'sound') { if (on !== A.on) toggleSound(on); return; }
+    if (name === 'showTools') { tools.style.display = on ? '' : 'none'; return; }
     prevListener(name, val);
   };
 
   /* ───────── export: PNG snapshot or a narrated-by-captions video ───────── */
   const expBtn = tbtn('exp', 'تصدير صورة أو فيديو · Export image or video (E)', () => openExport(true));
-  tbtn('full', 'ملء الشاشة · Fullscreen (F)', toggleFull);
+  const fullBtn = tbtn('full', 'ملء الشاشة · Fullscreen (F)', toggleFull);
+  if (DESK) { expBtn.remove(); fullBtn.remove(); }
   function toggleFull() { if (document.fullscreenElement) document.exitFullscreen(); else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {}); }
 
   const dlg = mk('div'); dlg.id = 'xdlg';
@@ -268,11 +274,14 @@
   window.addEventListener('keydown', (e) => {
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     const k = e.key.toLowerCase();
-    if (k === 'v') cycleClean(); else if (k === 'm') toggleSound(); else if (k === 'f') toggleFull(); else if (k === 'e') openExport(!dlg.classList.contains('open'));
+    if (k === 'v') cycleClean(); else if (k === 'm') toggleSound(); else if (DESK) return; else if (k === 'f') toggleFull(); else if (k === 'e') openExport(!dlg.classList.contains('open'));
     else if (k === 'escape') openExport(false);
   });
   const url = new URLSearchParams(location.search);
   if (url.has('clean')) { clean = Math.max(0, Math.min(2, +url.get('clean'))) - 1; cycleClean(); }
-  if (url.has('export')) openExport(true);
+  if (url.has('export') && !DESK) openExport(true);
+  // a wallpaper host may start the audio context suspended until the first input: resume it then
+  const resume = () => { if (A.ctx && A.ctx.state === 'suspended') A.ctx.resume(); };
+  window.addEventListener('pointerdown', resume, { passive: true }); window.addEventListener('keydown', resume);
   window.OLX_WEB = { audio: A, toggleSound, openExport };
 })();

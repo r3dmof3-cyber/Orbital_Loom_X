@@ -249,6 +249,24 @@ window.LIVELY_PROPS = {
   "value": true,
   "text": "الساعة والتاريخ / Clock & date"
  },
+ "showTools": {
+  "type": "checkbox",
+  "value": true,
+  "text": "أزرار العين والصوت على الشاشة / On-screen eye & sound buttons"
+ },
+ "sound": {
+  "type": "checkbox",
+  "value": false,
+  "text": "🔊 الصوت (محيطي لكل مشهد) / Sound (ambient, per scene)"
+ },
+ "volume": {
+  "type": "slider",
+  "value": 70,
+  "min": 0,
+  "max": 100,
+  "step": 5,
+  "text": "مستوى الصوت % / Sound volume %"
+ },
  "accent": {
   "type": "color",
   "value": "#F5B94A",
@@ -263,13 +281,5 @@ window.LIVELY_PROPS = {
   "type": "checkbox",
   "value": true,
   "text": "إمالة الكاميرا مع الماوس / Mouse parallax"
- },
- "volume": {
-  "type": "slider",
-  "value": 70,
-  "min": 0,
-  "max": 100,
-  "step": 5,
-  "text": "مستوى الصوت % / Sound volume %"
  }
 };

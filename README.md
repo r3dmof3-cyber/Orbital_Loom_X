@@ -30,7 +30,7 @@
 | 👁 **زر العين** | يخفي الأدوات: الواجهة كاملة ← الشرح فقط ← المشهد فقط |
 | 🎬 **تصدير صورة وفيديو** | صورة PNG حتى 4K، أو فيديو لعدة مشاهد متتالية مع الشرح والصوت، أفقي أو عمودي (Reels) أو مربع |
 | ⚡ **أداء وسرعة** | أداء تلقائي يضبط الدقة للحفاظ على السلاسة، ودعم حتى 4K، ورسم الثقب الأسود في منطقته فقط |
-| 🖥️ **نسختان** | نسخة الويب فيها كل الأدوات، ونسخة سطح المكتب خفيفة وإعداداتها من Customize في Lively |
+| 🖥️ **نسختان** | نسخة الويب فيها كل الأدوات. ونسخة سطح المكتب فيها العين والصوت، وإعداداتها من Customize في Lively |
 
 ![Cosmic stories](docs/screenshots/stories.jpg)
 
@@ -41,9 +41,10 @@
 | كل المشاهد والقصص الـ 14 | ✅ | ✅ |
 | المخرج السينمائي التلقائي | ✅ | ✅ |
 | الإعدادات | لوحة ⚙ على الشاشة | Customize في Lively |
-| الصوت | ✅ | — |
+| الصوت | ✅ زر 🔊 | ✅ زر 🔊 أو خيار "الصوت" في Customize |
 | تصدير صورة وفيديو | ✅ | — |
-| زر العين وملء الشاشة | ✅ | خيار "الواجهة" في Customize |
+| زر العين 👁 | ✅ | ✅ |
+| ملء الشاشة | ✅ | — |
 | واجهة الهاتف | ✅ | — |
 
 ### 📱 على الهاتف
@@ -174,7 +175,7 @@ Click the **⚙** button under the clock to open a side panel with **every** opt
 - **Eye button (web):** full interface → captions only → scene only.
 - **Export (web):** PNG up to 4K, or a multi-scene video with burned-in captions, labels and sound, in landscape, 9:16 or square.
 - **Speed:** auto performance (dynamic resolution), rendering up to 4K, and the black hole is shaded only where it is on screen.
-- **Two builds:** the website has every tool; the Lively ZIP is lean and is configured from Lively's Customize panel.
+- **Two builds:** the website has every tool; the Lively ZIP keeps the eye and sound and is configured from Lively's Customize panel.
 
 ### Features
 - **Analytic helical trails.** Each planet's path, including the Sun's galactic orbit, its vertical oscillation and the 60° tilt of the ecliptic, is evaluated on the GPU every frame. The trails stay perfectly smooth at any length.
@@ -203,7 +204,7 @@ shaders.js              all GLSL ES 3.00 shaders
 script.js               engine: simulation, camera director, renderer, Lively bridge
 stories.js              the six deep-sky stories
 settings.js             on-screen ⚙ settings panel (web build only)
-web.js                  toolbar, eye, sound, export, fullscreen (web build only)
+web.js                  toolbar: eye and sound (both builds), export and fullscreen (web only)
 props.js                generated from LivelyProperties.json by tools/build.py
 tools/build.py          regenerates props.js and the release ZIP
 LivelyInfo.json         Lively metadata
