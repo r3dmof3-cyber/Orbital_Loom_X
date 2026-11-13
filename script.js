@@ -17,7 +17,7 @@ const URLP = new URLSearchParams(location.search);
 
 /* ───────────────────────── settings (mirrors LivelyProperties.json) ───────────────────────── */
 const S = {
-  language: 0, viewMode: 0, directorInterval: 30, timeSpeed: 1, sunVelocity: 10, trailLength: 1,
+  language: 2, viewMode: 0, directorInterval: 30, timeSpeed: 1, sunVelocity: 10, trailLength: 1,
   trailStyle: 0, trailColor: 0, orbitModel: 0, planetStyle: 0, planetScale: 1, waveAmplitude: 40, waveCount: 4,
   background: 0, quality: 1, renderScale: 1, fpsLimit: 1, bloom: 1, exposure: 1, cinematicFx: true,
   showLabels: true, showDropLines: true, showExtinctions: true, showGalaxyGrid: true, heliosphere: 0,
@@ -909,6 +909,7 @@ function applyLanguage() {
   const l = L();
   document.documentElement.lang = S.language === 1 ? 'en' : 'ar';
   document.documentElement.dir = S.language === 1 ? 'ltr' : 'rtl';
+  hud.classList.toggle('bi', bi());
   $('subtitle').textContent = bi() ? `${T.ar.subtitle} · ${T.en.subtitle}` : l.subtitle;
   $('teleTitle').textContent = bi() ? `${T.ar.tele} · ${T.en.tele}` : l.tele;
   buildModes(); buildLegend(); buildTelemetry(); setLabelText(); updateCaption(true);
@@ -921,7 +922,7 @@ function buildModes() {
     const b = document.createElement('button');
     b.className = 'mode-btn';
     b.dataset.mode = i;
-    b.innerHTML = `<span class="ic">${MODE_ICONS[i]}</span><span class="lb">${bi() ? T.ar.modes[i] : name}</span><span class="k">${i}</span>`;
+    b.innerHTML = `<span class="ic">${MODE_ICONS[i]}</span><span class="lb">${bi() ? `${T.ar.modes[i]}<em class="en2">${T.en.modes[i]}</em>` : name}</span><span class="k">${i}</span>`;
     b.addEventListener('click', (e) => { e.stopPropagation(); selectMode(i); });
     el.appendChild(b);
   });
@@ -942,7 +943,7 @@ function buildLegend() {
     r.className = 'leg-row'; r.dataset.i = i;
     const c = trailColor(i).map((x) => Math.round(Math.min(1, x) * 255)).join(',');
     r.style.setProperty('--c', `rgb(${c})`);
-    r.innerHTML = `<span class="sw"></span><span class="nm">${S.language === 1 ? p.en : p.ar}</span><span class="hx">${S.language === 1 ? p.hEn : p.hAr}</span>`;
+    r.innerHTML = `<span class="sw"></span><span class="nm">${S.language === 1 ? p.en : p.ar}${bi() ? `<em class="en2">${p.en}</em>` : ''}</span><span class="hx">${S.language === 1 ? p.hEn : p.hAr}${bi() ? `<em class="en2">${p.hEn}</em>` : ''}</span>`;
     r.addEventListener('click', (e) => { e.stopPropagation(); followPlanet(cam.followIdx === i ? -1 : i); });
     el.appendChild(r);
   });

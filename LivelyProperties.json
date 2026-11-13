@@ -1,9 +1,13 @@
 {
   "language": {
     "type": "dropdown",
-    "value": 0,
+    "value": 2,
     "text": "اللغة / Language",
-    "items": [ "العربية", "English", "ثنائي اللغة / Bilingual" ]
+    "items": [
+      "العربية",
+      "English",
+      "ثنائي اللغة / Bilingual"
+    ]
   },
   "viewMode": {
     "type": "dropdown",
@@ -56,25 +60,40 @@
     "type": "dropdown",
     "value": 0,
     "text": "نمط المسارات / Trail style",
-    "items": [ "شرائط ضوئية متوهجة / Glow ribbons", "خيوط دقيقة / Fine filaments", "غبار نجمي منقط / Stardust" ]
+    "items": [
+      "شرائط ضوئية متوهجة / Glow ribbons",
+      "خيوط دقيقة / Fine filaments",
+      "غبار نجمي منقط / Stardust"
+    ]
   },
   "trailColor": {
     "type": "dropdown",
     "value": 0,
     "text": "ألوان المسارات / Trail colours",
-    "items": [ "ألوان الكواكب / Planet colours", "طيف قوس قزح / Spectral", "لون التمييز / Accent mono" ]
+    "items": [
+      "ألوان الكواكب / Planet colours",
+      "طيف قوس قزح / Spectral",
+      "لون التمييز / Accent mono"
+    ]
   },
   "orbitModel": {
     "type": "dropdown",
     "value": 0,
     "text": "نموذج الأدوار المدارية / Orbital periods",
-    "items": [ "فني مضغوط (أجمل) / Artistic compressed", "نسب كبلر الحقيقية / Real Kepler ratios" ]
+    "items": [
+      "فني مضغوط (أجمل) / Artistic compressed",
+      "نسب كبلر الحقيقية / Real Kepler ratios"
+    ]
   },
   "planetStyle": {
     "type": "dropdown",
     "value": 0,
     "text": "شكل الكواكب / Planet style",
-    "items": [ "واقعي إجرائي / Realistic", "طاقة نيون / Neon energy", "هولوغرام شبكي / Holographic" ]
+    "items": [
+      "واقعي إجرائي / Realistic",
+      "طاقة نيون / Neon energy",
+      "هولوغرام شبكي / Holographic"
+    ]
   },
   "planetScale": {
     "type": "slider",
@@ -104,13 +123,22 @@
     "type": "dropdown",
     "value": 0,
     "text": "خلفية الفضاء / Deep-space background",
-    "items": [ "سُدُم ونجوم / Nebulae + stars", "نجوم فقط / Stars only", "أسود نقي OLED / Pure black" ]
+    "items": [
+      "سُدُم ونجوم / Nebulae + stars",
+      "نجوم فقط / Stars only",
+      "أسود نقي OLED / Pure black"
+    ]
   },
   "quality": {
     "type": "dropdown",
     "value": 1,
     "text": "جودة المجرة / Galaxy quality",
-    "items": [ "اقتصادي / Eco (70k)", "متوازن / Balanced (150k)", "فائق / Ultra (260k)", "أقصى / Extreme (400k)" ]
+    "items": [
+      "اقتصادي / Eco (70k)",
+      "متوازن / Balanced (150k)",
+      "فائق / Ultra (260k)",
+      "أقصى / Extreme (400k)"
+    ]
   },
   "renderScale": {
     "type": "slider",
@@ -124,7 +152,11 @@
     "type": "dropdown",
     "value": 1,
     "text": "حد الإطارات / Frame-rate cap",
-    "items": [ "30 FPS (توفير)", "60 FPS", "بلا حد / Unlimited (144Hz+)" ]
+    "items": [
+      "30 FPS (توفير)",
+      "60 FPS",
+      "بلا حد / Unlimited (144Hz+)"
+    ]
   },
   "bloom": {
     "type": "slider",
@@ -171,13 +203,21 @@
     "type": "dropdown",
     "value": 0,
     "text": "فقاعة الغلاف الشمسي / Heliosphere",
-    "items": [ "تلقائي حسب اللقطة / Auto", "دائماً / Always", "إخفاء / Never" ]
+    "items": [
+      "تلقائي حسب اللقطة / Auto",
+      "دائماً / Always",
+      "إخفاء / Never"
+    ]
   },
   "hudLayout": {
     "type": "dropdown",
     "value": 0,
     "text": "الواجهة / HUD layout",
-    "items": [ "كاملة / Full", "مختصرة / Minimal", "بدون واجهة / None" ]
+    "items": [
+      "كاملة / Full",
+      "مختصرة / Minimal",
+      "بدون واجهة / None"
+    ]
   },
   "hudOpacity": {
     "type": "slider",

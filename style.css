@@ -242,3 +242,11 @@ html, body {
 #fallback[hidden] { display: none; }
 .boot, .boot * { transition: none !important; animation: none !important; }
 #hud.hidden { visibility: hidden; }
+/* bilingual second line (English under Arabic) */
+.en2 { display: block; font-style: normal; direction: ltr; text-align: right; font-size: .78em; letter-spacing: .03em; color: var(--ink-faint); margin-top: 1px; }
+.mode-btn.active .en2 { color: rgba(255, 255, 255, .55); }
+.leg-row .hx .en2 { font-size: .9em; }
+#hud.bi .mode-btn { padding-top: calc(4px * var(--s)); padding-bottom: calc(4px * var(--s)); }
+#hud.bi .legend { top: calc(545px * var(--s)); }
+.leg-row .en2 { display: inline; margin-inline-start: .5em; margin-top: 0; }
+.leg-row .hx .en2 { display: none; }
