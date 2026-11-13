@@ -2,8 +2,8 @@
 
 # 🌌 Orbital Loom X — الرحلة المجرية
 
-**خلفية حية تفاعلية لبرنامج [Lively Wallpaper](https://github.com/rocksdanister/lively) على ويندوز**
-**An interactive live wallpaper for [Lively Wallpaper](https://github.com/rocksdanister/lively) on Windows**
+**خلفية حية تفاعلية لبرنامج [Lively Wallpaper](https://github.com/lively-community/lively) على ويندوز**
+**An interactive live wallpaper for [Lively Wallpaper](https://github.com/lively-community/lively) on Windows**
 
 المجموعة الشمسية تنسج مسارات حلزونية وهي تسافر عبر مجرة درب التبانة. تُحسب الحركة رياضياً على كرت الشاشة (WebGL2).
 *The Solar System weaving helical paths as it voyages through the Milky Way. The motion is computed on the GPU with WebGL2.*
@@ -23,7 +23,7 @@
 ## 📥 التثبيت والتشغيل (عربي)
 
 ### الطريقة 1: ملف ZIP (موصى بها)
-1. ثبّت **Lively Wallpaper** مجاناً من [Microsoft Store](https://apps.microsoft.com/detail/9ntm2qc6qws7) أو من [GitHub](https://github.com/rocksdanister/lively/releases).
+1. ثبّت **Lively Wallpaper** مجاناً من [Microsoft Store](https://apps.microsoft.com/detail/9ntm2qc6qws7) أو من [GitHub](https://github.com/lively-community/lively/releases).
 2. حمّل الملف: **[Orbital_Loom_X_Galactic_Voyage.zip](https://github.com/r3dmof3-cyber/Orbital_Loom_X/raw/main/release/Orbital_Loom_X_Galactic_Voyage.zip)**. لا تفك الضغط.
 3. افتح Lively واضغط زر **➕ Add Wallpaper**، ثم **Choose a file** واختر ملف ZIP. ويمكنك أيضاً سحب الملف وإفلاته داخل نافذة Lively.
 4. اضغط على الخلفية في المكتبة لتطبيقها.
@@ -83,7 +83,7 @@ https://r3dmof3-cyber.github.io/Orbital_Loom_X/
 
 ## 📥 Install & Run (English)
 
-1. Install **Lively Wallpaper** (free) from the [Microsoft Store](https://apps.microsoft.com/detail/9ntm2qc6qws7) or [GitHub](https://github.com/rocksdanister/lively/releases).
+1. Install **Lively Wallpaper** (free) from the [Microsoft Store](https://apps.microsoft.com/detail/9ntm2qc6qws7) or [GitHub](https://github.com/lively-community/lively/releases).
 2. Download **[Orbital_Loom_X_Galactic_Voyage.zip](https://github.com/r3dmof3-cyber/Orbital_Loom_X/raw/main/release/Orbital_Loom_X_Galactic_Voyage.zip)**. Don't extract it.
 3. In Lively, click **➕ Add Wallpaper**, then **Choose a file**, and pick the ZIP. You can also drag and drop it into the Lively window.
 4. Click the wallpaper to apply it. Open **⋯ → Customize** for 30+ options.
