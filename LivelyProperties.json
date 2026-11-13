@@ -246,5 +246,10 @@
     "type": "checkbox",
     "value": true,
     "text": "إمالة الكاميرا مع الماوس / Mouse parallax"
+  },
+  "showGear": {
+    "type": "checkbox",
+    "value": true,
+    "text": "زر الإعدادات ⚙ على الشاشة / On-screen settings button"
   }
 }

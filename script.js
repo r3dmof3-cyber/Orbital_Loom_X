@@ -1045,6 +1045,7 @@ function selectMode(i) {
   S.viewMode = clamp(i | 0, 0, 7);
   cam.followIdx = -1;
   if (S.viewMode === 0) { directorIdx = 0; setShot(DIRECTOR_ORDER[0]); } else setShot(S.viewMode);
+  window.dispatchEvent(new CustomEvent('olx:prop', { detail: { name: 'viewMode', value: S.viewMode } }));
 }
 function followPlanet(i) {
   if (i >= 0) { cam.followIdx = i; cam.lastFollow = i; cam.zoom = 0; cam.userYaw = 0; cam.userPitch = 0; toast(L().toastFollow + (S.language === 1 ? PLANETS[i].en : PLANETS[i].ar)); }
@@ -1083,8 +1084,8 @@ window.addEventListener('keydown', (e) => {
   const k = e.key.toLowerCase();
   if (k >= '0' && k <= '7') selectMode(+k);
   else if (k === ' ') { sim.paused = !sim.paused; toast(sim.paused ? L().toastPause : L().toastPlay); e.preventDefault(); }
-  else if (k === 'h') { S.hudLayout = S.hudLayout === 2 ? 0 : 2; applyHud(); }
-  else if (k === 'l') S.showLabels = !S.showLabels;
+  else if (k === 'h') window.livelyPropertyListener('hudLayout', S.hudLayout === 2 ? 0 : 2);
+  else if (k === 'l') window.livelyPropertyListener('showLabels', !S.showLabels);
   else if (k === 'r') { cam.userYaw = 0; cam.userPitch = 0; cam.zoom = 0; followPlanet(-1); }
   else if (k === 'escape') followPlanet(-1);
   else if (k === 'arrowright') followPlanet((cam.followIdx + 1) % 8);

@@ -35,10 +35,27 @@
 ```
 https://r3dmof3-cyber.github.io/Orbital_Loom_X/
 ```
-> هذه الطريقة تحتاج إنترنت ولا تعرض قائمة Customize. لذلك طريقة ZIP أفضل.
+> هذه الطريقة تحتاج إنترنت، وقائمة Customize لا تظهر فيها. لكن كل الخيارات موجودة في زر الإعدادات ⚙ على الشاشة، والشرح في الأسفل.
 
 ### الطريقة 3: من المصدر
 حمّل المستودع (**Code → Download ZIP**) وفك الضغط، ثم اسحب ملف `index.html` إلى نافذة Lively.
+
+### الطريقة 4: في المتصفح فقط، بدون Lively
+افتح **https://r3dmof3-cyber.github.io/Orbital_Loom_X/** في أي متصفح حديث، مثل Chrome أو Edge أو Firefox. ويمكنك أيضاً فتح ملف `index.html` من المجلد بعد فك الضغط. اضغط **F11** للعرض بملء الشاشة.
+
+---
+
+## ⚙️ زر الإعدادات على الشاشة
+
+في الزاوية العلوية اليمنى، تحت الساعة، يوجد زر **⚙**. عند الضغط عليه تفتح لوحة جانبية فيها **كل** خيارات الخلفية، وهي نفس خيارات Customize في Lively، مقسمة إلى خمسة أقسام: المشهد والحركة، والمسارات والكواكب، والمظهر، والواجهة، والأداء.
+
+- يظهر أثر أي تغيير فوراً، ويُحفظ تلقائياً في المتصفح، فتبقى إعداداتك كما هي في المرة القادمة.
+- زر **↺ الافتراضي** يرجع كل الخيارات إلى قيمها الأصلية.
+- اختصار لوحة المفاتيح: حرف **`S`** يفتح اللوحة ويغلقها، و **`Esc`** يغلقها.
+- رابط يفتح اللوحة مباشرة: https://r3dmof3-cyber.github.io/Orbital_Loom_X/?settings=1
+- لإخفاء الزر داخل Lively: من Customize ألغِ خيار **زر الإعدادات ⚙ على الشاشة**.
+
+![Settings panel](docs/screenshots/settings-panel.jpg)
 
 ---
 
@@ -72,6 +89,7 @@ https://r3dmof3-cyber.github.io/Orbital_Loom_X/
 | `0`–`7` | تغيير اللقطة |
 | `Space` | إيقاف الزمن مؤقتاً |
 | `H` / `L` | إخفاء الواجهة أو الأسماء |
+| `S` | فتح الإعدادات أو إغلاقها |
 | `←` `→` / `Esc` | التنقل بين الكواكب أو إلغاء التتبع |
 
 ## ⚙️ نصائح الأداء
@@ -89,7 +107,12 @@ https://r3dmof3-cyber.github.io/Orbital_Loom_X/
 4. Click the wallpaper to apply it. Open **⋯ → Customize** for 30+ options.
 5. For mouse interaction, go to **Settings → Wallpaper → Wallpaper Input → Mouse**.
 
-**No download?** In Lively's *Enter URL* box, paste `https://r3dmof3-cyber.github.io/Orbital_Loom_X/`. This needs an internet connection and has no Customize panel.
+**No download?** In Lively's *Enter URL* box, paste `https://r3dmof3-cyber.github.io/Orbital_Loom_X/`. This needs an internet connection.
+
+**Browser only, without Lively:** open https://r3dmof3-cyber.github.io/Orbital_Loom_X/ in any modern browser, or open `index.html` from the extracted folder. Press **F11** for fullscreen.
+
+### ⚙️ On-screen settings
+Click the **⚙** button under the clock to open a side panel with **every** option from Lively's Customize panel. Changes apply instantly and are saved in your browser. **↺ Reset** restores the defaults, **`S`** toggles the panel, and `?settings=1` opens it on load. Inside Lively you can hide the button from Customize.
 
 ### Features
 - **Analytic helical trails.** Each planet's path, including the Sun's galactic orbit, its vertical oscillation and the 60° tilt of the ecliptic, is evaluated on the GPU every frame. The trails stay perfectly smooth at any length.
@@ -106,7 +129,7 @@ https://r3dmof3-cyber.github.io/Orbital_Loom_X/
 - 100% offline, with no external libraries.
 
 ### Controls
-Drag to orbit, scroll to zoom, click a planet to follow it, and double-click to reset. Keys: `0–7` shots, `Space` pause, `H` HUD, `L` labels, `←/→` cycle planets, `Esc` stop following.
+Drag to orbit, scroll to zoom, click a planet to follow it, and double-click to reset. Keys: `0–7` shots, `Space` pause, `H` HUD, `L` labels, `S` settings, `←/→` cycle planets, `Esc` stop following.
 
 ---
 
@@ -116,13 +139,16 @@ index.html              page layout & HUD
 style.css               glass HUD styling
 shaders.js              all GLSL ES 3.00 shaders
 script.js               engine: simulation, camera director, renderer, Lively bridge
+settings.js             on-screen ⚙ settings panel (works in Lively and in any browser)
+props.js                generated from LivelyProperties.json by tools/build.py
+tools/build.py          regenerates props.js and the release ZIP
 LivelyInfo.json         Lively metadata
 LivelyProperties.json   Lively "Customize" options
 release/                ready-to-import ZIP
 docs/screenshots/       images for this README
 ```
 
-To rebuild the ZIP from source, zip these files together at the root of the archive: `index.html style.css shaders.js script.js LivelyInfo.json LivelyProperties.json thumbnail.jpg preview.gif README_AR.txt`.
+To rebuild after editing, run `python tools/build.py`. It regenerates `props.js` from `LivelyProperties.json` and repacks `release/Orbital_Loom_X_Galactic_Voyage.zip`.
 
 ## 📜 License
 [MIT](LICENSE). Free to use, share and modify; please keep the credit.
