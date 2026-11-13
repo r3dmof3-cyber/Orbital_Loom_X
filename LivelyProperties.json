@@ -1,0 +1,210 @@
+{
+  "language": {
+    "type": "dropdown",
+    "value": 0,
+    "text": "اللغة / Language",
+    "items": [ "العربية", "English", "ثنائي اللغة / Bilingual" ]
+  },
+  "viewMode": {
+    "type": "dropdown",
+    "value": 0,
+    "text": "اللقطة / Camera Shot",
+    "items": [
+      "🎬 مخرج سينمائي تلقائي / Auto Cinematic Director",
+      "🌀 الدوامة الحلزونية / Helical Vortex",
+      "〰️ المنظور الجانبي / Side Profile",
+      "🌌 الرحلة المجرية / Galactic Voyage",
+      "⚫ الثقب الأسود الرامي A* / Sagittarius A*",
+      "🫧 فقاعة الغلاف الشمسي / Heliosphere",
+      "🕸️ نسيج الزمكان / Spacetime Fabric",
+      "🖱️ كاميرا حرة / Free Camera"
+    ]
+  },
+  "directorInterval": {
+    "type": "slider",
+    "value": 30,
+    "min": 12,
+    "max": 120,
+    "step": 1,
+    "text": "مدة اللقطة في المخرج (ثانية) / Shot duration (s)"
+  },
+  "timeSpeed": {
+    "type": "slider",
+    "value": 100,
+    "min": 10,
+    "max": 400,
+    "step": 5,
+    "text": "سرعة الزمن % / Time speed %"
+  },
+  "sunVelocity": {
+    "type": "slider",
+    "value": 10,
+    "min": 3,
+    "max": 30,
+    "step": 1,
+    "text": "سرعة الشمس (تمدد اللولب) / Sun velocity (helix stretch)"
+  },
+  "trailLength": {
+    "type": "slider",
+    "value": 100,
+    "min": 20,
+    "max": 300,
+    "step": 5,
+    "text": "طول المسارات % / Trail length %"
+  },
+  "trailStyle": {
+    "type": "dropdown",
+    "value": 0,
+    "text": "نمط المسارات / Trail style",
+    "items": [ "شرائط ضوئية متوهجة / Glow ribbons", "خيوط دقيقة / Fine filaments", "غبار نجمي منقط / Stardust" ]
+  },
+  "trailColor": {
+    "type": "dropdown",
+    "value": 0,
+    "text": "ألوان المسارات / Trail colours",
+    "items": [ "ألوان الكواكب / Planet colours", "طيف قوس قزح / Spectral", "لون التمييز / Accent mono" ]
+  },
+  "orbitModel": {
+    "type": "dropdown",
+    "value": 0,
+    "text": "نموذج الأدوار المدارية / Orbital periods",
+    "items": [ "فني مضغوط (أجمل) / Artistic compressed", "نسب كبلر الحقيقية / Real Kepler ratios" ]
+  },
+  "planetStyle": {
+    "type": "dropdown",
+    "value": 0,
+    "text": "شكل الكواكب / Planet style",
+    "items": [ "واقعي إجرائي / Realistic", "طاقة نيون / Neon energy", "هولوغرام شبكي / Holographic" ]
+  },
+  "planetScale": {
+    "type": "slider",
+    "value": 100,
+    "min": 50,
+    "max": 300,
+    "step": 5,
+    "text": "حجم الكواكب % / Planet size %"
+  },
+  "waveAmplitude": {
+    "type": "slider",
+    "value": 40,
+    "min": 0,
+    "max": 120,
+    "step": 1,
+    "text": "سعة تموج الشمس عبر القرص / Galactic wave amplitude"
+  },
+  "waveCount": {
+    "type": "slider",
+    "value": 4,
+    "min": 1,
+    "max": 8,
+    "step": 1,
+    "text": "عدد التموجات في الدورة / Waves per orbit"
+  },
+  "background": {
+    "type": "dropdown",
+    "value": 0,
+    "text": "خلفية الفضاء / Deep-space background",
+    "items": [ "سُدُم ونجوم / Nebulae + stars", "نجوم فقط / Stars only", "أسود نقي OLED / Pure black" ]
+  },
+  "quality": {
+    "type": "dropdown",
+    "value": 1,
+    "text": "جودة المجرة / Galaxy quality",
+    "items": [ "اقتصادي / Eco (70k)", "متوازن / Balanced (150k)", "فائق / Ultra (260k)", "أقصى / Extreme (400k)" ]
+  },
+  "renderScale": {
+    "type": "slider",
+    "value": 100,
+    "min": 40,
+    "max": 100,
+    "step": 5,
+    "text": "دقة الرسم % / Render resolution %"
+  },
+  "fpsLimit": {
+    "type": "dropdown",
+    "value": 1,
+    "text": "حد الإطارات / Frame-rate cap",
+    "items": [ "30 FPS (توفير)", "60 FPS", "بلا حد / Unlimited (144Hz+)" ]
+  },
+  "bloom": {
+    "type": "slider",
+    "value": 100,
+    "min": 0,
+    "max": 250,
+    "step": 5,
+    "text": "قوة التوهج Bloom %"
+  },
+  "exposure": {
+    "type": "slider",
+    "value": 100,
+    "min": 40,
+    "max": 200,
+    "step": 5,
+    "text": "السطوع / Exposure %"
+  },
+  "cinematicFx": {
+    "type": "checkbox",
+    "value": true,
+    "text": "مؤثرات سينمائية (حبيبات + تظليل الحواف) / Film grain & vignette"
+  },
+  "showLabels": {
+    "type": "checkbox",
+    "value": true,
+    "text": "أسماء الكواكب والمعالم / Labels"
+  },
+  "showDropLines": {
+    "type": "checkbox",
+    "value": true,
+    "text": "أعمدة الارتفاع عن قرص المجرة / Drop lines"
+  },
+  "showExtinctions": {
+    "type": "checkbox",
+    "value": true,
+    "text": "علامات الانقراضات الكبرى على المدار / Extinction markers"
+  },
+  "showGalaxyGrid": {
+    "type": "checkbox",
+    "value": true,
+    "text": "شبكة مستوى المجرة / Galactic plane grid"
+  },
+  "heliosphere": {
+    "type": "dropdown",
+    "value": 0,
+    "text": "فقاعة الغلاف الشمسي / Heliosphere",
+    "items": [ "تلقائي حسب اللقطة / Auto", "دائماً / Always", "إخفاء / Never" ]
+  },
+  "hudLayout": {
+    "type": "dropdown",
+    "value": 0,
+    "text": "الواجهة / HUD layout",
+    "items": [ "كاملة / Full", "مختصرة / Minimal", "بدون واجهة / None" ]
+  },
+  "hudOpacity": {
+    "type": "slider",
+    "value": 90,
+    "min": 20,
+    "max": 100,
+    "step": 5,
+    "text": "شفافية الواجهة % / HUD opacity %"
+  },
+  "showClock": {
+    "type": "checkbox",
+    "value": true,
+    "text": "الساعة والتاريخ / Clock & date"
+  },
+  "accent": {
+    "type": "color",
+    "value": "#F5B94A",
+    "text": "لون التمييز / Accent colour"
+  },
+  "audioReactive": {
+    "type": "checkbox",
+    "value": true,
+    "text": "تفاعل مع الصوت / Audio reactive"
+  },
+  "mouseParallax": {
+    "type": "checkbox",
+    "value": true,
+    "text": "إمالة الكاميرا مع الماوس / Mouse parallax"
+  }
+}

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Orbital Loom X — Galactic Voyage</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="gl"></canvas>
+  <div id="labels"></div>
+
+  <div id="hud">
+    <header class="brand panel-lite">
+      <svg class="logo" viewBox="0 0 48 48" aria-hidden="true">
+        <circle cx="24" cy="24" r="5.5" fill="var(--accent)"/>
+        <ellipse cx="24" cy="24" rx="19" ry="7.5" fill="none" stroke="var(--accent)" stroke-width="1.4" opacity=".75" transform="rotate(-28 24 24)"/>
+        <ellipse cx="24" cy="24" rx="12" ry="4.5" fill="none" stroke="#9ecbff" stroke-width="1.1" opacity=".7" transform="rotate(-28 24 24)"/>
+        <circle cx="41" cy="15" r="2.2" fill="#9ecbff"/>
+      </svg>
+      <div>
+        <div class="title">ORBITAL LOOM <b>X</b></div>
+        <div class="subtitle" id="subtitle"></div>
+      </div>
+    </header>
+
+    <div class="clock" id="clock">
+      <div class="time" id="clockTime">00:00</div>
+      <div class="date" id="clockDate"></div>
+    </div>
+
+    <nav class="modes panel" id="modes"></nav>
+
+    <section class="legend panel" id="legend"></section>
+
+    <section class="telemetry panel" id="telemetry">
+      <div class="tele-head"><span id="teleTitle"></span><span class="live"><i></i>LIVE</span></div>
+      <div class="tele-grid" id="teleGrid"></div>
+      <canvas id="wave" width="300" height="54"></canvas>
+      <div class="tele-foot" id="teleFoot"></div>
+    </section>
+
+    <section class="caption" id="caption">
+      <div class="shot-index" id="shotIndex"></div>
+      <div class="shot-name" id="shotName"></div>
+      <div class="shot-desc" id="shotDesc"></div>
+      <div class="shot-bar"><i id="shotProgress"></i></div>
+      <div class="credit" id="credit">
+        <span class="ar">برمجة وتصميم: <b>يوسف أنور الكمالي</b></span>
+        <span class="sep">·</span>
+        <span class="en">Yousif Anwar Alkmali</span>
+        <span class="sep">·</span>
+        <span class="mail">r3dmof3@gmail.com</span>
+      </div>
+    </section>
+
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <div id="fallback" hidden>
+    <h1>WebGL2 غير متاح</h1>
+    <p>This wallpaper needs WebGL2 (GPU acceleration). Enable hardware acceleration in Lively / WebView2.</p>
+  </div>
+
+  <script src="shaders.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "AppVersion": "2.6.0.0",
+  "Title": "Orbital Loom X | الرحلة المجرية — Galactic Voyage",
+  "Thumbnail": "thumbnail.jpg",
+  "Preview": "preview.gif",
+  "Desc": "محرك WebGL2 سينمائي: مسارات حلزونية تحليلية فائقة النعومة للكواكب، مجرة درب التبانة بأكثر من 150 ألف نجم، ثقب أسود بانحناء ضوئي حقيقي، فقاعة الغلاف الشمسي، نسيج الزمكان، مخرج سينمائي تلقائي، HDR + Bloom. يعمل محلياً بالكامل. برمجة وتصميم: يوسف أنور الكمالي (r3dmof3@gmail.com).",
+  "Author": "Yousif Anwar Alkmali — يوسف أنور الكمالي",
+  "License": "MIT",
+  "Contact": "https://github.com/r3dmof3-cyber/Orbital_Loom_X",
+  "Type": 1,
+  "FileName": "index.html",
+  "Arguments": "--audio",
+  "IsAbsolutePath": false
+}
