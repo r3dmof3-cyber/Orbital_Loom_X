@@ -14,11 +14,25 @@
 
 ![Helical vortex](docs/screenshots/1-helical-vortex.jpg)
 
-**برمجة وتصميم: يوسف أنور الكمالي — Yousif Anwar Alkmali — r3dmof3@gmail.com**
+**Developed by Y.A Al-Kmali · r3dmof3@gmail.com**
 
 </div>
 
 ---
+
+## 🆕 الجديد في الإصدار 2.4
+
+- ✶ **قصة سابعة: السيمفونية الكونية**: ثقب أسود ونجم طارق وكيلونوفا وأمواج جاذبية وعوالم، كلها في مشهد واحد.
+- 🌙 **أقمار الكواكب** (خيار جديد): قمر الأرض، وفوبوس وديموس، وأقمار المشتري الأربعة، وتيتان وريا، وتيتانيا وأوبيرون، وتريتون. كل قمر يدور في مستوى خط استواء كوكبه، وتظهر أسماؤها عند تتبّع الكوكب.
+- 🎵 **التفاعل مع صوت الجهاز (داخل Lively)**: Lively يمرر للخلفية طيف الصوت الذي يشتغل على الكمبيوتر، مثل الموسيقى. فتتفاعل معه المسارات والشمس والمجرة وقرص الثقب الأسود ووميض النجم الطارق وأمواج نسيج الزمكان. الخيار: **تفاعل مع الصوت**.
+- 🔧 إصلاحات:
+  - النقطة البيضاء التي كانت تظهر وسط الكواكب: كانت بداية مسار الكوكب، وصارت تختفي قرب الكوكب.
+  - حلقات أورانوس الناقصة: كان ظل الكوكب عليها حاداً، وصار ظلاً ناعماً.
+  - نهاية موكب الأحجام: صارت لقطة واضحة للكواكب الثمانية أمام الشمس بالمقياس الحقيقي.
+  - الحلقات البعيدة: لم تعد تتشوه حين تصغر على الشاشة.
+- 📐 شرح رياضي كامل للحركة والرسم في [MATH.md](MATH.md).
+
+![Cosmic Symphony](docs/screenshots/7-cosmic-symphony.jpg)
 
 ## 🆕 الجديد في الإصدار 2.0
 
@@ -132,7 +146,8 @@ https://r3dmof3-cyber.github.io/Orbital_Loom_X/
 | 10 | 💥 كيلونوفا | نجمان نيوترونيان يقتربان حلزونياً، وأمواج الجاذبية على نسيج الزمكان، ثم الاندماج |
 | 11 | ☯ ثلاثة ثقوب سوداء | مسألة الأجسام الثلاثة: محاكاة فوضوية حقيقية تتغير في كل مرة |
 | 12 | 🕳 العملاق TON 618 | الكاميرا تبتعد من المجموعة الشمسية حتى يظهر الثقب الأسود كاملاً بمقياس حقيقي |
-| 13 | 📏 موكب الأحجام | الأحجام الحقيقية للكواكب والشمس جنباً إلى جنب |
+| 13 | ✶ السيمفونية الكونية | ثقب أسود، ونجم طارق، ونجمان نيوترونيان يندمجان، وأمواج جاذبية، وعوالم تدور، كلها في مشهد واحد |
+| 14 | 📏 موكب الأحجام | الكواكب بأحجامها الحقيقية واحداً واحداً، ثم تبتعد الكاميرا فتظهر الثمانية أمام الشمس |
 
 | | |
 |---|---|
@@ -179,6 +194,17 @@ https://r3dmof3-cyber.github.io/Orbital_Loom_X/
 
 ### ⚙️ On-screen settings
 Click the **⚙** button under the clock to open a side panel with **every** option from Lively's Customize panel. Changes apply instantly and are saved in your browser. **↺ Reset** restores the defaults, **`S`** toggles the panel, and `?settings=1` opens it on load. The panel is part of the web build; the Lively wallpaper uses Lively's own Customize panel.
+
+### What's new in 2.4
+- **Seventh story, Cosmic Symphony:** a black hole, a pulsar, a kilonova with gravitational waves, and orbiting worlds, all in one scene.
+- **Planetary moons** (option): the Moon, Phobos and Deimos, the Galilean moons, Titan and Rhea, Titania and Oberon, and Triton. Each orbits in its planet's equatorial plane, and names appear while you follow the planet.
+- **System-audio reactive in Lively:** trails, the Sun, the galaxy, the black hole's disc, pulsar flashes and fabric waves all respond to whatever is playing on the PC.
+- **Fixes:**
+  - The bright dot on planets' faces is gone; trails now fade near their own body.
+  - Uranus's rings have a soft shadow instead of a hard cut.
+  - Parade of Sizes ends on a clean true-scale shot of all eight planets beside the Sun.
+  - Distant rings no longer alias.
+- **Docs:** the maths behind the motion and rendering is in [MATH.md](MATH.md).
 
 ### What's new in 2.0
 - **Six cosmic stories:** a pulsar with four real spin rates, TRAPPIST-1, a kilonova with gravitational waves, a chaotic three-black-hole simulation, a true-scale zoom out from the Solar System to TON 618, and a parade of true planet sizes.
@@ -227,6 +253,8 @@ stories.js              the six deep-sky stories
 textures/               2K planet maps (CC BY 4.0, Solar System Scope); embedded as maps.js in the ZIP
 settings.js             on-screen ⚙ settings panel (web build only)
 web.js                  toolbar: eye and sound (both builds), export and fullscreen (web only)
+MATH.md                 the maths behind the motion and the rendering
+sitemap.xml, robots.txt search-engine hints for the live site
 props.js                generated from LivelyProperties.json by tools/build.py
 tools/build.py          regenerates props.js and the release ZIP
 LivelyInfo.json         Lively metadata

@@ -21,7 +21,7 @@ const S = {
   trailStyle: 0, trailColor: 0, orbitModel: 0, planetStyle: 0, planetScale: 1, waveAmplitude: 40, waveCount: 4,
   background: 0, quality: 1, renderScale: 1, fpsLimit: 1, bloom: 1, exposure: 1, cinematicFx: true,
   showLabels: true, showDropLines: true, showExtinctions: true, showGalaxyGrid: true, heliosphere: 0,
-  hudLayout: 0, hudOpacity: 0.9, showClock: true, accent: '#F5B94A', audioReactive: true, mouseParallax: true, directorStories: true, autoPerf: true, resolution: 0, photoMaps: true,
+  hudLayout: 0, hudOpacity: 0.9, showClock: true, accent: '#F5B94A', audioReactive: true, mouseParallax: true, directorStories: true, autoPerf: true, resolution: 0, photoMaps: true, showMoons: true,
 };
 
 /* ───────────────────────── world constants ───────────────────────── */
@@ -69,9 +69,10 @@ const SHOTS = [
   { id: 'kilonova', story: 'kilonova', tc: 1, frame: 'w', yaw: 0.5, pitch: 0.62, dist: 100, rate: 0.3, trail: 7, gain: 0, drift: 0.20, helio: 0, fabric: 0, grid: 0, ext: 0 },
   { id: 'threebody',story: 'threebody',tc: 1, frame: 'w', yaw: 0.3, pitch: 0.78, dist: 112, rate: 0.3, trail: 7, gain: 0, drift: 0.18, helio: 0, fabric: 0, grid: 0, ext: 0 },
   { id: 'ton618',   story: 'ton618',   tc: 1, frame: 'w', yaw: 1.5708, pitch: 0.10, dist: 560, rate: 0.3, trail: 7, gain: 0, drift: 0.10, still: 1, helio: 0, fabric: 0, grid: 0, ext: 0 },
+  { id: 'symphony', story: 'symphony', tc: 1, frame: 'w', yaw: 0.35, pitch: 0.40, dist: 230, rate: 0.3, trail: 7, gain: 0, drift: 0.30, helio: 0, fabric: 0, grid: 0, ext: 0 },
   { id: 'sizes',    story: 'sizes',    tc: 1, frame: 'w', yaw: 1.5708, pitch: 0.06, dist: 1,  rate: 0.3, trail: 7, gain: 0, drift: 0.05, still: 1, helio: 0, fabric: 0, grid: 0, ext: 0 },
 ];
-const DIRECTOR_SOLAR = [1, 2, 5, 3, 4, 3, 6], DIRECTOR_ALL = [1, 2, 8, 5, 3, 9, 4, 10, 6, 12, 3, 11, 13];
+const DIRECTOR_SOLAR = [1, 2, 5, 3, 4, 3, 6], DIRECTOR_ALL = [1, 2, 8, 5, 3, 9, 4, 10, 6, 12, 3, 11, 14, 13];
 let DIRECTOR_ORDER = DIRECTOR_ALL;
 const storyOf = (i) => (SHOTS[i] && SHOTS[i].story) || null;
 
@@ -79,7 +80,7 @@ const storyOf = (i) => (SHOTS[i] && SHOTS[i].story) || null;
 const T = {
   ar: {
     subtitle: 'رحلة المجموعة الشمسية عبر مجرة درب التبانة',
-    modes: ['المخرج السينمائي', 'الدوامة الحلزونية', 'المنظور الجانبي', 'الرحلة المجرية', 'الثقب الأسود A*', 'الغلاف الشمسي', 'نسيج الزمكان', 'كاميرا حرة', 'النجم الطارق (النابض)', 'ترابيست-1', 'كيلونوفا', 'ثلاثة ثقوب سوداء', 'العملاق TON 618', 'موكب الأحجام'],
+    modes: ['المخرج السينمائي', 'الدوامة الحلزونية', 'المنظور الجانبي', 'الرحلة المجرية', 'الثقب الأسود A*', 'الغلاف الشمسي', 'نسيج الزمكان', 'كاميرا حرة', 'النجم الطارق (النابض)', 'ترابيست-1', 'كيلونوفا', 'ثلاثة ثقوب سوداء', 'العملاق TON 618', 'السيمفونية الكونية', 'موكب الأحجام'],
     tabs: ['الرحلة', 'قصص كونية'],
     shots: {
       vortex: ['الدوامة الحلزونية', 'الشمس لا تقف ساكنة؛ إنها تندفع بنحو 230 كم/ث حول مركز المجرة، فترسم الكواكب حولها لوالب ممتدة بدلاً من دوائر مغلقة.'],
@@ -94,6 +95,7 @@ const T = {
       kilonova: ['كيلونوفا — مصنع الذهب', 'نجمان نيوترونيان يدوران حول بعضهما، وتحمل أمواج الجاذبية طاقتهما بعيداً فيقتربان ويتسارعان حتى يندمجا في انفجار يصنع الذهب والبلاتين.'],
       threebody: ['ثلاثة ثقوب سوداء — مسألة الأجسام الثلاثة', 'جسمان يرقصان في مدار منتظم، لكن بإضافة جسم ثالث تصير الحركة فوضوية لا يمكن التنبؤ بها على المدى البعيد، وكثيراً ما تنتهي بقذف أحد الثلاثة بعيداً.'],
       ton618: ['TON 618 — عملاق الثقوب السوداء', 'ثقب أسود كتلته نحو 66 مليار شمس. أفق حدثه يتسع لمجموعتنا الشمسية أكثر من أربعين مرة؛ مدار نبتون كله يبدو نقطة صغيرة أمامه.'],
+      symphony: ['السيمفونية الكونية', 'كل قوى الكون في مشهد واحد: ثقب أسود يلوي الضوء في القلب، ونجم طارق يكنس الفضاء بحزمتيه، ونجمان نيوترونيان يقتربان حتى يندمجا فيرسلان أمواج الجاذبية عبر نسيج الزمكان، وعوالم تدور على حافة هذا كله.'],
       sizes: ['موكب الأحجام', 'الأحجام الحقيقية جنباً إلى جنب: من عطارد الصغير إلى المشتري الذي يتسع لأكثر من 1300 أرض، ثم الشمس التي تتسع لمليون وثلاثمئة ألف أرض.'],
       follow: ['تتبّع', 'تتبع الكاميرا الآن هذا الكوكب في مساره اللولبي — انقر في الفراغ أو اضغط Esc للعودة.'],
     },
@@ -108,7 +110,7 @@ const T = {
   },
   en: {
     subtitle: 'The Solar System’s voyage through the Milky Way',
-    modes: ['Cinematic Director', 'Helical Vortex', 'Side Profile', 'Galactic Voyage', 'Black Hole A*', 'Heliosphere', 'Spacetime Fabric', 'Free Camera', 'Pulsar (Al-Tariq)', 'TRAPPIST-1', 'Kilonova', 'Three Black Holes', 'Giant TON 618', 'Parade of Sizes'],
+    modes: ['Cinematic Director', 'Helical Vortex', 'Side Profile', 'Galactic Voyage', 'Black Hole A*', 'Heliosphere', 'Spacetime Fabric', 'Free Camera', 'Pulsar (Al-Tariq)', 'TRAPPIST-1', 'Kilonova', 'Three Black Holes', 'Giant TON 618', 'Cosmic Symphony', 'Parade of Sizes'],
     tabs: ['Voyage', 'Cosmic stories'],
     shots: {
       vortex: ['Helical Vortex', 'The Sun is never still: racing ~230 km/s around the galactic centre, it drags every planet into a stretched helix instead of a closed loop.'],
@@ -123,6 +125,7 @@ const T = {
       kilonova: ['Kilonova — the gold factory', 'Two neutron stars circle each other. Gravitational waves carry their energy away, so they spiral in faster and faster until they merge in a blast that forges gold and platinum.'],
       threebody: ['Three black holes — the three-body problem', 'Two bodies waltz in a regular orbit. Add a third and the motion turns chaotic and unpredictable in the long run, often ending with one of the three flung away.'],
       ton618: ['TON 618 — the giant', 'A black hole of about 66 billion Suns. Its event horizon could hold our Solar System more than forty times over; Neptune’s whole orbit is a small dot in front of it.'],
+      symphony: ['Cosmic Symphony', 'Every force in one scene: a black hole bending light at the centre, a pulsar sweeping space with its beams, two neutron stars spiralling into a merger that ripples spacetime with gravitational waves, and worlds circling at the edge of it all.'],
       sizes: ['Parade of Sizes', 'True sizes side by side: from little Mercury to Jupiter, which could hold more than 1,300 Earths, and then the Sun, which could hold 1.3 million.'],
       follow: ['Following', 'The camera now rides this planet along its helix — click empty space or press Esc to return.'],
     },
@@ -530,7 +533,8 @@ const cam = {
 let activeShot = 1, directorIdx = 0, shotTimer = 0;
 
 function currentShotId() { return S.viewMode === 0 ? DIRECTOR_ORDER[directorIdx % DIRECTOR_ORDER.length] : S.viewMode; }
-let fade = 1, fadeDir = 0, pendingShot = -1;
+let fade = 1, fadeDir = 0, pendingShot = -1, dipCb = null;
+function dip(cb) { if (fadeDir) return false; fadeDir = -1; pendingShot = -2; dipCb = cb; return true; }
 function setShot(id, instant) {
   if (!instant && storyOf(id) !== storyOf(activeShot)) { pendingShot = id; fadeDir = -1; shotTimer = 0; return; }   // cut through black
   activeShot = id; shotTimer = 0; cam.storyDist = 1;
@@ -554,7 +558,8 @@ function updateSim(dt) {
   sim.dtReal = dt;
   if (fadeDir) {
     fade = clamp(fade + fadeDir * dt / 0.5, 0, 1);
-    if (fadeDir < 0 && fade === 0) { const id = pendingShot; pendingShot = -1; fadeDir = 1; setShot(id, true); if (!storyOf(id)) buildTelemetry(); }
+    if (fadeDir < 0 && fade === 0 && pendingShot === -2) { pendingShot = -1; fadeDir = 1; const cb = dipCb; dipCb = null; if (cb) cb(); }
+    else if (fadeDir < 0 && fade === 0) { const id = pendingShot; pendingShot = -1; fadeDir = 1; setShot(id, true); if (!storyOf(id)) buildTelemetry(); }
     else if (fadeDir > 0 && fade === 1) fadeDir = 0;
   }
   // director
@@ -719,6 +724,43 @@ function wantMaps() {
   mapsAsked = true;
   MAP_NAMES.concat(['earth_night']).forEach(loadMap);
 }
+/* ── moons: [ar, en, size (× parent size), orbit (× parent size), period (days), tint, ecliptic plane?] ── */
+const MOONS = {
+  2: [['القمر', 'Moon', 0.27, 2.4, 27.3, [1.05, 1.03, 1.0], true]],
+  3: [['فوبوس', 'Phobos', 0.22, 1.7, 0.32, [0.85, 0.74, 0.62]], ['ديموس', 'Deimos', 0.18, 2.5, 1.26, [0.92, 0.82, 0.70]]],
+  4: [['آيو', 'Io', 0.11, 1.7, 1.77, [1.35, 1.12, 0.48]], ['يوروبا', 'Europa', 0.095, 2.15, 3.55, [1.25, 1.18, 1.02]],
+      ['غانيميد', 'Ganymede', 0.135, 2.7, 7.15, [0.92, 0.86, 0.78]], ['كاليستو', 'Callisto', 0.125, 3.4, 16.7, [0.62, 0.58, 0.54]]],
+  5: [['ريا', 'Rhea', 0.09, 2.75, 4.52, [1.1, 1.08, 1.05]], ['تيتان', 'Titan', 0.15, 3.4, 15.9, [1.3, 0.92, 0.42]]],
+  6: [['تيتانيا', 'Titania', 0.13, 2.6, 8.7, [0.95, 0.92, 0.9]], ['أوبيرون', 'Oberon', 0.13, 3.2, 13.5, [0.85, 0.8, 0.78]]],
+  7: [['تريتون', 'Triton', 0.17, 2.6, -5.88, [1.08, 1.0, 1.04]]],
+};
+const moonLabels = {};
+let moonLabelsUsed = new Set();
+function drawMoons(i, pos, R, b, F, sunV, parentPx) {
+  const list = MOONS[i], following = cam.followIdx === i;
+  list.forEach((m, k) => {
+    const days = Math.abs(m[4]), dir = Math.sign(m[4]);
+    const ph = (sim.T * TAU / (Math.pow(days / 365.25, 0.3) * 1.6)) * dir + k * 2.1 + i;
+    const a1 = m[6] ? F.r : b.a1, a2 = m[6] ? F.e2 : b.a2;
+    const orbit = R * m[3], c = Math.cos(ph) * orbit, s = Math.sin(ph) * orbit;
+    const mp = v3.add(pos, v3.add(v3.mul(a1, c), v3.mul(a2, s)));
+    const mr = Math.max(R * m[2], 0.045 * S.planetScale);
+    const basis = { a1, a2, axis: v3.norm(v3.cross(a1, a2)) };
+    const px = drawBody(mp, mr, 0, { uBasis: basisMat(basis), uSpin: ph, uEmis: 1, uColor: m[5], uSunV: sunV, uRingN: [0, 1, 0], uMoonTint: m[5] });
+    if (following && S.showLabels) {
+      const key = i + ':' + k;
+      let el = moonLabels[key];
+      if (!el) { el = moonLabels[key] = mkLabel('planet moon'); el.style.setProperty('--c', '#cfd8e8'); }
+      el.querySelector('.n').textContent = S.language === 1 ? m[1] : bi() ? `${m[0]} · ${m[1]}` : m[0];
+      place(el, project(cam.vp, mp), px > 0.3 ? 0.85 : 0, Math.max(px / (window.devicePixelRatio || 1), 2) + 5, 0, false);
+      moonLabelsUsed.add(key);
+    }
+  });
+}
+function hideIdleMoonLabels() {
+  for (const key in moonLabels) if (!moonLabelsUsed.has(key)) { moonLabels[key].style.opacity = 0; moonLabels[key]._n = null; }
+  moonLabelsUsed = new Set();
+}
 function drawBody(center, R, type, extra) {
   const d = v3.len(v3.sub(center, cam.eye));
   if (d <= R * 1.02) return 0;
@@ -735,7 +777,7 @@ function drawBody(center, R, type, extra) {
   use(bodyP, Object.assign({
     uView: cam.view, uProj: cam.proj, uCenter: center, uQuad: q, uCenterV: cv, uR: R, uFocal: cam.focal,
     uTime: sim.realTime, uType: type, uStyle: S.planetStyle, uAudio: sim.audio,
-    uLod: clamp((pxR - 22) / 200, 0, 1) * [0.5, 1, 1, 1][S.quality], uMap: 0, uMap2: 1, uUseMap: 0,
+    uLod: clamp((pxR - 22) / 200, 0, 1) * [0.5, 1, 1, 1][S.quality], uMap: 0, uMap2: 1, uUseMap: 0, uMoonTint: [0, 0, 0],
   }, extra));
   if (S.photoMaps && S.planetStyle === 0 && pxR > 3) {
     wantMaps();
@@ -811,7 +853,9 @@ function render() {
     });
     screenPlanets.push({ i, pos, pxR });
     if (p.ring && pxR > 0.6) ringJobs.push({ i, pos, R, b });
+    if (S.showMoons && MOONS[i] && pxR > 1.5) drawMoons(i, pos, R, b, F, sunV, pxR);
   });
+  hideIdleMoonLabels();
 
   // ── black hole ──
   const bhD = v3.len(cam.eye);
@@ -847,7 +891,7 @@ function render() {
   // ── galaxy ──
   gl.blendFunc(gl.ONE, gl.ONE);
   gl.bindVertexArray(galaxy.vao);
-  const galU = { uVP: cam.vp, uRot: sim.galRot, uFocal: cam.focal, uTime: sim.realTime, uGain: 1.0, uMaxStar: 4.5, uClear: clamp((1100 - v3.len(cam.eye)) / 600, 0, 1), uPx: Math.max(0.75, pxScale) };
+  const galU = { uVP: cam.vp, uRot: sim.galRot, uFocal: cam.focal, uTime: sim.realTime, uGain: 1.0 + sim.audio * 0.45, uMaxStar: 4.5, uClear: clamp((1100 - v3.len(cam.eye)) / 600, 0, 1), uPx: Math.max(0.75, pxScale) };
   use(P.galaxy, galU);
   gl.drawArrays(gl.POINTS, 0, galaxy.nAdd);
   gl.blendFunc(gl.ZERO, gl.ONE_MINUS_SRC_ALPHA);
@@ -869,7 +913,7 @@ function render() {
   // ── galactic orbit ring + drop lines ──
   const ringGain = 0.10 + 0.25 * cam.grid;
   drawTrail(base, { uR: 0, uPhase: 0, uW: 0, uAge0: -galacticP * 0.5, uAge1: galacticP * 0.5, uWidth: 1.3 * pxScale, uWorldW: 0.08,
-    uColor: [0.75, 0.8, 1.0], uColor2: [0.75, 0.8, 1.0], uGain: ringGain * (1 - cam.fabric), uFadePow: 0, uHead: 0, uDash: 0, uStyle: 1 }, 2048);
+    uColor: [0.75, 0.8, 1.0], uColor2: [0.75, 0.8, 1.0], uGain: ringGain * (1 - cam.fabric), uFadePow: 0, uHead: 0, uClear: 0, uDash: 0, uStyle: 1 }, 2048);
   if (S.showDropLines && cam.fabric < 0.98) {
     const N = 110;
     use(P.drop, Object.assign(pathUniforms(F), { uVP: cam.vp, uViewport: [W, Hh], uStep: trailYears * 1.1 / N, uCount: N, uWidth: 1.4 * pxScale,
@@ -880,9 +924,9 @@ function render() {
   // ── sun path: past (fading) and ahead (dashed) ──
   const sunCol = [1.0, 0.78, 0.42];
   drawTrail(base, { uR: 0, uPhase: 0, uW: 0, uAge0: 0, uAge1: trailYears * 1.25, uWidth: 2.2 * pxScale, uWorldW: 0.16, uColor: sunCol, uColor2: [1, 0.5, 0.2],
-    uGain: 0.9 * (1 - cam.fabric), uFadePow: 1.3, uHead: 0, uDash: 0, uStyle: 0 }, 1024);
+    uGain: 0.9 * (1 - cam.fabric), uFadePow: 1.3, uHead: 0, uDash: 0, uStyle: 0, uClear: SUN_R * sunScale * 1.6 }, 1024);
   drawTrail(base, { uR: 0, uPhase: 0, uW: 0, uAge0: 0, uAge1: -trailYears * 0.6, uWidth: 1.6 * pxScale, uWorldW: 0.1, uColor: sunCol, uColor2: sunCol,
-    uGain: 0.45 * (1 - cam.fabric), uFadePow: 1.0, uHead: 0, uDash: 38, uStyle: 1 }, 512);
+    uGain: 0.45 * (1 - cam.fabric), uFadePow: 1.0, uHead: 0, uDash: 38, uStyle: 1, uClear: SUN_R * sunScale * 1.6 }, 512);
 
   // ── planet helices ──
   const tGain = cam.gain * (1 - cam.fabric) * (1 + sim.audio * 0.35);
@@ -891,7 +935,8 @@ function render() {
     PLANETS.forEach((p, i) => {
       const c = trailColor(i);
       drawTrail(base, { uR: p.R, uPhase: sim.phases[i], uW: wOf(p), uAge0: 0, uAge1: trailYears, uWidth: width, uWorldW: S.trailStyle === 1 ? 0.06 : 0.16,
-        uColor: c, uColor2: v3.lerp(c, [0.35, 0.2, 0.6], 0.55), uGain: tGain * (S.trailStyle === 1 ? 2.2 : 1.35), uFadePow: 1.15, uHead: 1.2, uDash: 0, uStyle: S.trailStyle }, segs);
+        uColor: c, uColor2: v3.lerp(c, [0.35, 0.2, 0.6], 0.55), uGain: tGain * (S.trailStyle === 1 ? 2.2 : 1.35), uFadePow: 1.15, uHead: 1.2, uDash: 0, uStyle: S.trailStyle,
+        uClear: p.size * S.planetScale * (p.ring ? p.ring : 1) }, segs);
     });
   }
 
@@ -1064,7 +1109,7 @@ function applyLanguage() {
   $('teleTitle').textContent = bi() ? `${T.ar.tele} · ${T.en.tele}` : l.tele;
   buildModes(); buildLegend(); buildTelemetry(); setLabelText(); updateCaption(true);
 }
-const MODE_ICONS = ['🎬', '🌀', '〰', '🌌', '⚫', '🫧', '🕸', '🖱', '✦', '🔴', '💥', '☯', '🕳', '📏'];
+const MODE_ICONS = ['🎬', '🌀', '〰', '🌌', '⚫', '🫧', '🕸', '🖱', '✦', '🔴', '💥', '☯', '🕳', '✶', '📏'];
 let modeTab = 0;
 function buildModes() {
   const l = L(), el = $('modes');
@@ -1287,6 +1332,7 @@ window.livelyPropertyListener = function (name, val) {
     case 'directorStories': S.directorStories = bool(val); DIRECTOR_ORDER = S.directorStories ? DIRECTOR_ALL : DIRECTOR_SOLAR; directorIdx = 0; if (S.viewMode === 0) setShot(DIRECTOR_ORDER[0]); break;
     case 'autoPerf': S.autoPerf = bool(val); if (!S.autoPerf) { drs = 1; resize(); } break;
     case 'photoMaps': S.photoMaps = bool(val); break;
+    case 'showMoons': S.showMoons = bool(val); break;
     case 'resolution': S.resolution = clamp(n | 0, 0, 4); drs = S.resolution ? 1 : GPU_TIER === 0 ? 0.7 : 1; resize(); break;
     case 'fpsLimit': S.fpsLimit = clamp(n | 0, 0, 2); break;
     case 'bloom': S.bloom = clamp(n / 100, 0, 3); break;
@@ -1350,7 +1396,8 @@ function autoPerf(dt) {
   }
 }
 
-canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); }, false);
+// if the GPU driver resets, try to get the context back; if it does not come back, reload the page
+canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); setTimeout(() => { if (gl.isContextLost()) location.reload(); }, 2500); }, false);
 canvas.addEventListener('webglcontextrestored', () => location.reload(), false);
 window.addEventListener('resize', resize);
 
@@ -1364,10 +1411,12 @@ if (URLP.has('lang')) window.livelyPropertyListener('language', +URLP.get('lang'
 if (URLP.has('hud')) window.livelyPropertyListener('hudLayout', +URLP.get('hud'));
 if (URLP.has('shot')) { S.viewMode = +URLP.get('shot'); modeTab = S.viewMode >= 8 ? 1 : 0; buildModes(); setShot(S.viewMode === 0 ? DIRECTOR_ORDER[0] : S.viewMode, true); }
 else setShot(DIRECTOR_ORDER[0], true);
+if (URLP.has('set')) URLP.get('set').split(',').forEach((kv) => { const [k, v] = kv.split(':'); if (k && v !== undefined) window.livelyPropertyListener(k, isNaN(+v) ? v : +v); });   // ?set=bloom:0,showMoons:0
+if (URLP.has('follow')) { followPlanet(clamp(+URLP.get('follow') | 0, 0, 7)); cam.zoom = clamp(+(URLP.get('zoom') || 0), -2.2, 2.4); if (URLP.has('zoom')) cam.idle = -1e9; }
 if (URLP.has('t')) { const t = +URLP.get('t'); for (let i = 0; i < t * 30; i++) updateSim(1 / 30); }
 window.__olx = { S, sim, cam, setShot, selectMode, followPlanet, gl, program, use, P, emptyVAO, drawBody, basisMat, mulPoint, mulDir, v3, project,
   fabricMesh, T, SHOTS, labelLayer, hooks, render, resize, canvas, clamp, lerp, PLANETS,
   size: () => [W, Hh], shot: () => activeShot, fade: () => fade, lang: () => S.language,
-  setFixedSize: (sz) => { fixedSize = sz; resize(); }, renderNow: () => { updateSim(0); render(); } };
+  setFixedSize: (sz) => { fixedSize = sz; resize(); }, dip, maps, renderNow: () => { updateSim(0); render(); }, step: (dt) => { updateSim(dt); render(); } };
 requestAnimationFrame(frame);
 })();

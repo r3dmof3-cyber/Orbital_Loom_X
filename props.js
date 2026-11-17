@@ -28,6 +28,7 @@ window.LIVELY_PROPS = {
    "💥 كيلونوفا / Kilonova",
    "☯ ثلاثة ثقوب سوداء / Three Black Holes",
    "🕳 العملاق TON 618 / TON 618",
+   "✶ السيمفونية الكونية / Cosmic Symphony",
    "📏 موكب الأحجام / Parade of Sizes"
   ]
  },
@@ -111,6 +112,11 @@ window.LIVELY_PROPS = {
   "type": "checkbox",
   "value": true,
   "text": "خرائط حقيقية للكواكب (مع النمط الواقعي) / Photographic planet maps (Realistic style)"
+ },
+ "showMoons": {
+  "type": "checkbox",
+  "value": true,
+  "text": "أقمار الكواكب / Planetary moons"
  },
  "planetScale": {
   "type": "slider",

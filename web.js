@@ -52,7 +52,7 @@
   const SCN = {
     vortex: [0.50, 0.10, 0.00, 55.0], side: [0.45, 0.14, 0.00, 61.7], galaxy: [0.40, 0.30, 0.05, 49.0], bh: [0.22, 0.10, 0.70, 41.2], helio: [0.30, 0.60, 0.00, 55.0],
     fabric: [0.55, 0.05, 0.25, 65.4], free: [0.50, 0.10, 0.00, 55.0], pulsar: [0.22, 0.14, 0.05, 61.7], trappist: [0.55, 0.08, 0.00, 73.4], kilonova: [0.28, 0.10, 0.30, 55.0],
-    threebody: [0.20, 0.06, 0.80, 43.6], ton618: [0.14, 0.05, 1.00, 32.7], sizes: [0.55, 0.05, 0.00, 65.4],
+    threebody: [0.20, 0.06, 0.80, 43.6], ton618: [0.14, 0.05, 1.00, 32.7], sizes: [0.55, 0.05, 0.00, 65.4], symphony: [0.42, 0.12, 0.55, 49.0],
   };
   function initAudio() {
     const C = new (window.AudioContext || window.webkitAudioContext)();
@@ -139,7 +139,7 @@
   function toggleFull() { if (document.fullscreenElement) document.exitFullscreen(); else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {}); }
 
   const dlg = mk('div'); dlg.id = 'xdlg';
-  const sceneIds = [1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13];
+  const sceneIds = [1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14];
   dlg.innerHTML = `<div class="xbox" dir="rtl">
     <header><div class="set-title">تصدير <span>· Export</span></div><button type="button" class="set-x" data-x>✕</button></header>
     <div class="xrow"><label>النوع · Type</label><select id="xKind"><option value="video">فيديو · Video</option><option value="png">صورة PNG · Image</option></select></div>
@@ -214,7 +214,7 @@
     cx.direction = 'ltr'; cx.font = `${17 * u}px ${FONT}`; cx.fillStyle = 'rgba(220,230,248,.7)';
     enLines.forEach((l) => { cx.fillText(l, w / 2, y + 16 * u); y += 25 * u; });
     cx.font = `${13.5 * u}px ${FONT}`; cx.fillStyle = 'rgba(245,185,74,.9)';
-    cx.fillText('Orbital Loom X  ·  برمجة وتصميم: يوسف أنور الكمالي  ·  Yousif Anwar Alkmali', w / 2, h - 22 * u);
+    cx.fillText('Orbital Loom X  ·  Developed by Y.A Al-Kmali  ·  r3dmof3@gmail.com', w / 2, h - 22 * u);
     cx.shadowBlur = 0;
   }
   function download(blob, ext) {

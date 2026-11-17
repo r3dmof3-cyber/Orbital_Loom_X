@@ -22,7 +22,7 @@
 
   const GROUPS = [
     { ar: 'المشهد والحركة', en: 'Scene & motion', keys: ['language', 'viewMode', 'directorStories', 'directorInterval', 'timeSpeed', 'sunVelocity', 'orbitModel', 'waveAmplitude', 'waveCount'] },
-    { ar: 'المسارات والكواكب', en: 'Trails & planets', keys: ['trailLength', 'trailStyle', 'trailColor', 'planetStyle', 'photoMaps', 'planetScale'] },
+    { ar: 'المسارات والكواكب', en: 'Trails & planets', keys: ['trailLength', 'trailStyle', 'trailColor', 'planetStyle', 'photoMaps', 'showMoons', 'planetScale'] },
     { ar: 'المظهر', en: 'Look', keys: ['accent', 'background', 'bloom', 'exposure', 'cinematicFx', 'heliosphere', 'showLabels', 'showDropLines', 'showExtinctions', 'showGalaxyGrid'] },
     { ar: 'الواجهة والتفاعل', en: 'Interface', keys: ['hudLayout', 'hudOpacity', 'showClock', 'showTools', 'sound', 'volume', 'audioReactive', 'mouseParallax'] },
     { ar: 'الأداء', en: 'Performance', keys: ['resolution', 'autoPerf', 'quality', 'renderScale', 'fpsLimit'] },
@@ -89,7 +89,7 @@
     <div class="set-body" id="setBody"></div>
     <footer class="set-foot">
       <button type="button" class="set-reset" id="setReset">↺ الافتراضي · Reset</button>
-      <div class="set-credit">برمجة وتصميم: <b>يوسف أنور الكمالي</b> · Yousif Anwar Alkmali</div>
+      <div class="set-credit">Developed by <b>Y.A Al-Kmali</b> · r3dmof3@gmail.com</div>
     </footer>`;
   document.body.appendChild(panel);
 

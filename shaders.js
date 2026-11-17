@@ -214,7 +214,7 @@ float ringDensity(float r){
   return d * 0.35;
 }
 
-uniform float uLod, uUseMap; uniform sampler2D uMap, uMap2;
+uniform float uLod, uUseMap; uniform sampler2D uMap, uMap2; uniform vec3 uMoonTint;
 // equirectangular lookup; uv and its seam-free derivatives are computed once in main(), outside any branch
 vec2 gUV, gDx, gDy;
 vec3 mapAt(sampler2D t, vec3 p){ return textureGrad(t, gUV, gDx, gDy).rgb; }
@@ -433,6 +433,7 @@ void main(){
         night = nt * nt * vec3(1.0, 0.78, 0.50) * 3.2 * (1.0 - cl * 0.8);
       } else alb = t * (uType == 1 ? 0.95 : 1.12);
     }
+    if (uMoonTint.x + uMoonTint.y + uMoonTint.z > 0.0) alb *= uMoonTint;
     col = alb * diff * shadow * 1.28 + alb * 0.05;
     col += alb * pow(1.0 - mu, 2.0) * 0.18 * clamp(ndl + 0.5, 0.0, 1.0);
     vec3 H2 = normalize(L + V);
@@ -500,12 +501,15 @@ float ringDensity(float r){
 }
 void main(){
   float r = length(vQ);
-  float d = ringDensity(r);
+  float fw = fwidth(r);   // when the bands are finer than a pixel, average them instead of aliasing
+  float d = fw > 0.012 ? (ringDensity(r - fw * 0.4) + ringDensity(r - fw * 0.13) + ringDensity(r + fw * 0.13) + ringDensity(r + fw * 0.4)) * 0.25 : ringDensity(r);
   if (d < 0.005) discard;
   vec3 toSun = normalize(uSun - vW);
   vec3 oc = vW - uCenter;
   float b = dot(oc, toSun); float c = dot(oc, oc) - uR*uR; float disc = b*b - c;
-  float sh = (disc > 0.0 && -b - sqrt(disc) > 0.0) ? 0.06 : 1.0;
+  // soft-edged shadow of the planet on its rings (penumbra), dark but never a hard cut
+  float dperp = sqrt(max(dot(oc, oc) - b * b, 0.0));
+  float sh = b < 0.0 ? mix(0.16, 1.0, smoothstep(uR * 0.86, uR * 1.12, dperp)) : 1.0;
   float sideL = dot(uN, toSun); float sideV = dot(uN, uCam - vW);
   float lit = sideL * sideV > 0.0 ? 1.0 : 0.38;
   vec3 col = uType == 5 ? mix(vec3(0.70,0.62,0.50), vec3(0.95,0.88,0.74), smoothstep(1.5, 2.0, r)) : vec3(0.6,0.8,0.85);
@@ -532,7 +536,7 @@ vec3 pathPos(float age, float R, float phase, float w){
 const VS_TRAIL = H + PATH + `
 uniform mat4 uVP; uniform vec2 uViewport; uniform float uFocal;
 uniform float uR, uPhase, uW, uAge0, uAge1, uSegs, uWidth, uWorldW;
-out float vS; out float vSide;
+out float vS; out float vSide; out float vD;
 void main(){
   int vid = gl_VertexID;
   float endF = (vid == 1 || vid == 2 || vid == 4) ? 1.0 : 0.0;
@@ -542,7 +546,9 @@ void main(){
   vec4 c0 = uVP * vec4(pathPos(mix(uAge0, uAge1, s0), uR, uPhase, uW), 1.0);
   vec4 c1 = uVP * vec4(pathPos(mix(uAge0, uAge1, s1), uR, uPhase, uW), 1.0);
   const float NW = 0.02;
-  if (c0.w < NW && c1.w < NW) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); vS = 1.0; vSide = 0.0; return; }
+  if (c0.w < NW && c1.w < NW) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); vS = 1.0; vSide = 0.0; vD = 0.0; return; }
+  vec3 headP = pathPos(uAge0, uR, uPhase, uW);
+  vD = distance(pathPos(mix(uAge0, uAge1, endF > 0.5 ? s1 : s0), uR, uPhase, uW), headP);
   if (c0.w < NW) c0 = mix(c0, c1, (NW - c0.w) / (c1.w - c0.w));
   if (c1.w < NW) c1 = mix(c1, c0, (NW - c1.w) / (c0.w - c1.w));
   vec2 p0 = c0.xy / c0.w * uViewport * 0.5, p1 = c1.xy / c1.w * uViewport * 0.5;
@@ -557,8 +563,8 @@ void main(){
   vS = mix(s0, s1, endF); vSide = side;
 }`;
 const FS_TRAIL = H + `
-in float vS; in float vSide; out vec4 o;
-uniform vec3 uColor, uColor2; uniform float uGain, uFadePow, uHead, uDash, uStyle, uSegs;
+in float vS; in float vSide; in float vD; out vec4 o;
+uniform vec3 uColor, uColor2; uniform float uGain, uFadePow, uHead, uDash, uStyle, uSegs, uClear;
 void main(){
   float x = vSide;
   float core = exp(-x * x * 26.0);
@@ -569,6 +575,8 @@ void main(){
   if (uDash > 0.0) fade *= step(0.45, fract(vS * uDash));
   if (uStyle == 2.0) { float k = fract(vS * uSegs * 0.125); fade *= pow(1.0 - abs(k - 0.5) * 2.0, 6.0) * 2.5; }
   float head = uHead * exp(-vS * 70.0);
+  // a trail is the path of the body's centre: where it runs toward the camera it would show as a bright dot on the body's face
+  if (uClear > 0.0) { float k = smoothstep(uClear * 0.95, uClear * 1.9, vD); fade *= k; head *= k; }
   vec3 col = mix(uColor, uColor2, vS);
   o = vec4(col * prof * (fade + head) * uGain, 0.0);
 }`;
@@ -709,7 +717,7 @@ void main(){ o = vec4(vec3(0.55, 0.75, 1.0) * vA * exp(-vSide*vSide*2.5) * uGain
 // ── spacetime fabric sheet ──
 const VS_FABRIC = H + `
 layout(location=0) in vec2 aUV;
-uniform mat4 uVP; uniform vec3 uSun, uE1, uE2, uN; uniform float uL, uDK; uniform vec4 uMass[9]; uniform vec4 uWave;
+uniform mat4 uVP; uniform vec3 uSun, uE1, uE2, uN; uniform float uL, uDK; uniform vec4 uMass[9]; uniform vec4 uWave; uniform vec2 uWaveC;
 out vec2 vQ; out float vDepth; out float vR;
 float well(vec2 q){
   float d = 0.0;
@@ -719,8 +727,8 @@ float well(vec2 q){
 void main(){
   vec2 q = aUV * uL;
   float d = max(well(q) - well(vec2(uL, 0.0)), 0.0);
-  float rr = length(q);
-  d += uWave.x * sin(rr * uWave.y - uWave.z + 2.0 * atan(q.y, q.x)) * smoothstep(uWave.w, uWave.w + 9.0, rr) * (1.0 - smoothstep(uL * 0.72, uL, rr));
+  vec2 qw = q - uWaveC; float rr = length(qw);
+  d += uWave.x * sin(rr * uWave.y - uWave.z + 2.0 * atan(qw.y, qw.x)) * smoothstep(uWave.w, uWave.w + 9.0, rr) * (1.0 - smoothstep(uL * 0.72, uL, rr));
   vec3 w = uSun + uE1 * q.x + uE2 * q.y - uN * (d * uDK);
   vQ = q; vDepth = d; vR = length(q);
   gl_Position = uVP * vec4(w, 1.0);
@@ -746,7 +754,9 @@ void main(){
 // ── post processing ──
 const FS_PRE = H + `
 in vec2 vUv; out vec4 o; uniform sampler2D uTex; uniform vec2 uTexel; uniform float uThresh;
-vec3 tap(vec2 uv){ vec3 c = texture(uTex, uv).rgb; float br = max(c.r, max(c.g, c.b)); float knee = uThresh * 0.6;
+// a single NaN/Inf pixel (some drivers produce one at a silhouette) would be smeared over the whole frame by the blur: drop it here
+vec3 safe3(vec3 c){ return (c.r >= 0.0 && c.r < 6.0e4 && c.g >= 0.0 && c.g < 6.0e4 && c.b >= 0.0 && c.b < 6.0e4) ? c : vec3(0.0); }
+vec3 tap(vec2 uv){ vec3 c = safe3(texture(uTex, uv).rgb); float br = max(c.r, max(c.g, c.b)); float knee = uThresh * 0.6;
   float soft = clamp(br - uThresh + knee, 0.0, 2.0 * knee); soft = soft * soft / (4.0 * knee + 1e-4);
   float contrib = max(soft, br - uThresh) / max(br, 1e-4); return min(c * contrib, vec3(60.0)); }
 void main(){ vec2 h = uTexel; o = vec4((tap(vUv + vec2(-h.x,-h.y)) + tap(vUv + vec2(h.x,-h.y)) + tap(vUv + vec2(-h.x,h.y)) + tap(vUv + vec2(h.x,h.y))) * 0.25, 1.0); }`;
@@ -774,6 +784,7 @@ void main(){
   vec3 col;
   if (uCA > 0.0) { vec2 off = dc * r2 * uCA; col = vec3(texture(uScene, vUv - off).r, texture(uScene, vUv).g, texture(uScene, vUv + off).b); }
   else col = texture(uScene, vUv).rgb;
+  col = (col.r >= 0.0 && col.r < 6.0e4 && col.g >= 0.0 && col.g < 6.0e4 && col.b >= 0.0 && col.b < 6.0e4) ? col : vec3(0.0);
   col += texture(uBloom, vUv).rgb * uBloomStr;
   col *= uExposure;
   col = aces(col);
