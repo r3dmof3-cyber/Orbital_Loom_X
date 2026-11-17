@@ -106,6 +106,13 @@
 https://r3dmof3-cyber.github.io/Orbital_Loom_X/
 ```
 > هذه الطريقة تحتاج إنترنت، وقائمة Customize لا تظهر فيها. لكن كل الخيارات موجودة في زر الإعدادات ⚙ على الشاشة، والشرح في الأسفل.
+>
+> **ملاحظة:** عند الإضافة برابط، Lively لا يقرأ وصف الخلفية ولا اسم المبرمج من الموقع، فيترك خانتي **Description** و **Author** فارغتين (هكذا يعمل البرنامج مع كل الروابط). يمكنك كتابتهما بنفسك في نافذة الإضافة، أو نسخ هذا:
+> - **Title:** `Orbital Loom X — Galactic Voyage`
+> - **Description:** `رحلة المجموعة الشمسية عبر درب التبانة وسبع قصص كونية · The Solar System's voyage through the Milky Way + 7 cosmic stories`
+> - **Author:** `Y.A Al-Kmali`
+>
+> ملف ZIP يحمل هذه المعلومات تلقائياً.
 
 ### الطريقة 3: من المصدر
 حمّل المستودع (**Code → Download ZIP**) وفك الضغط، ثم اسحب ملف `index.html` إلى نافذة Lively.
@@ -189,6 +196,8 @@ https://r3dmof3-cyber.github.io/Orbital_Loom_X/
 5. For mouse interaction, go to **Settings → Wallpaper → Wallpaper Input → Mouse**.
 
 **No download?** In Lively's *Enter URL* box, paste `https://r3dmof3-cyber.github.io/Orbital_Loom_X/`. This needs an internet connection.
+
+> Lively does not read a description or author from web pages, so with a URL those fields stay empty (that is how Lively handles every URL). Type them in the add dialog: Title `Orbital Loom X — Galactic Voyage`, Author `Y.A Al-Kmali`. The ZIP carries this information automatically.
 
 **Browser only, without Lively:** open https://r3dmof3-cyber.github.io/Orbital_Loom_X/ in any modern browser, or open `index.html` from the extracted folder. Press **F11** for fullscreen.
 
